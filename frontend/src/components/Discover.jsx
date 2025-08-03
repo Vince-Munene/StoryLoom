@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import BlogBot from './BlogBot';
 
 const Discover = () => {
   const navigate = useNavigate();
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const recommendations = [
     {
@@ -164,11 +166,14 @@ const Discover = () => {
 
       {/* Floating Chat Icon */}
       <div className="fixed right-8 bottom-4 transform -translate-y-1/2">
-        <button className={`p-3 rounded-lg transition-colors duration-200 ${
-          isDarkMode 
-            ? 'bg-gray-700 hover:bg-gray-600' 
-            : 'bg-gray-200 hover:bg-gray-300'
-        }`}>
+        <button 
+          onClick={() => setIsChatOpen(true)}
+          className={`p-3 rounded-lg transition-colors duration-200 ${
+            isDarkMode 
+              ? 'bg-gray-700 hover:bg-gray-600' 
+              : 'bg-gray-200 hover:bg-gray-300'
+          }`}
+        >
           <svg className={`w-6 h-6 ${
             isDarkMode ? 'text-gray-400' : 'text-gray-600'
           }`} width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -176,6 +181,9 @@ const Discover = () => {
           </svg>
         </button>
       </div>
+      
+      {/* BlogBot Chat Panel */}
+      <BlogBot isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
       </main>
     </div>
   );
