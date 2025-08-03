@@ -1,10 +1,17 @@
 import { useState } from 'react';
 import booksBackground from '../assets/books-background.jpg';
+import CreateNewPassword from './CreateNewPassword';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [showCreateNewPassword, setShowCreateNewPassword] = useState(false);
+
+  // Show CreateNewPassword component if email was submitted successfully
+  if (showCreateNewPassword) {
+    return <CreateNewPassword />;
+  }
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -39,7 +46,8 @@ const ForgotPassword = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
       console.log('Forgot password request:', { email });
-      // Here you would typically send the OTP and navigate to verification
+      // Navigate to CreateNewPassword after successful email submission
+      setShowCreateNewPassword(true);
     } catch (error) {
       console.error('Forgot password error:', error);
     } finally {

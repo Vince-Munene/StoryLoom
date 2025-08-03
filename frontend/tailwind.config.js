@@ -9,6 +9,7 @@ export default {
       colors: {
         midbrown: "#B1521E",
         darkbrown: "#7F3608",
+        cream: "#F3D0B4"
       },
       fontFamily: {
         inter: ["Inter", "sans-serif"],
