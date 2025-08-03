@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const CreateArticle = ({ 
   postId = null, 
@@ -31,7 +31,7 @@ const CreateArticle = ({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
@@ -261,6 +261,54 @@ const CreateArticle = ({
 
   return (
     <div className={`h-screen flex flex-col ${isDarkMode ? 'bg-black' : 'bg-white'}`}>
+      {/* Navigation Bar */}
+      <header className={`border-b ${isDarkMode ? 'border-gray-800 bg-gray-900' : 'border-gray-200 bg-white'} px-6 py-4`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-8">
+            <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Discover</h1>
+            <nav className="flex items-center space-x-6">
+              <Link to="/home" className={`${isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>Home</Link>
+              <Link to="/discover" className={`${isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>Explore</Link>
+              <Link to="/CreateArticle" className={`${isDarkMode ? 'text-orange-400' : 'text-orange-600'} font-medium`}>Write</Link>
+            </nav>
+          </div>
+          
+          <div className="flex items-center space-x-4">
+            <input
+              type="text"
+              placeholder="Search"
+              className={`px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent w-64 ${
+                isDarkMode 
+                  ? 'border-gray-700 bg-gray-800 text-white placeholder-gray-400' 
+                  : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+              }`}
+            />
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-md hover:bg-gray-100 transition-colors"
+            >
+              {isDarkMode ? (
+                <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                </svg>
+              )}
+            </button>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+              isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-300 text-gray-600'
+            }`}>
+              A
+            </div>
+            <button className="px-6 py-2 bg-orange-600 text-white font-medium rounded-md hover:bg-orange-700 transition-colors">
+              SEARCH
+            </button>
+          </div>
+        </div>
+      </header>
+
       {/* Main Header */}
       <div className={`px-8 py-4 border-b ${isDarkMode ? 'border-gray-800' : 'border-gray-200'}`}>
         <div className="flex justify-between items-center">
