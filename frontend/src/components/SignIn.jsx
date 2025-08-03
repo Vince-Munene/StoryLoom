@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import booksBackground from '../assets/books-background.jpg';
-import CompleteProfile from './CompleteProfile';
+import CompleteProfile from './CreateAccount';
 
 const SignIn = () => {
   const [activeTab, setActiveTab] = useState('signin');

@@ -4,13 +4,14 @@ import logo from '../assets/avatar-placeholder.svg';
 
 const CompleteProfile = () => {
   const [formData, setFormData] = useState({
-    fullName: 'Full Name',
-    phoneNumber: '+254 710201985',
-    gender: 'Female',
-    dateOfBirth: 'MM/DD/YYYY'
+    fullName: '',
+    phoneNumber: '',
+    gender: '',
+    dateOfBirth: ''
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -29,19 +30,19 @@ const CompleteProfile = () => {
   const validateForm = () => {
     const newErrors = {};
     
-    if (!formData.fullName || formData.fullName === 'Full Name') {
+    if (!formData.fullName || formData.fullName === '') {
       newErrors.fullName = 'Full name is required';
     }
     
-    if (!formData.phoneNumber || formData.phoneNumber === '+254 710201985') {
+    if (!formData.phoneNumber || formData.phoneNumber === '') {
       newErrors.phoneNumber = 'Phone number is required';
     }
     
-    if (!formData.gender || formData.gender === 'Female') {
+    if (!formData.gender || formData.gender === '') {
       newErrors.gender = 'Gender is required';
     }
     
-    if (!formData.dateOfBirth || formData.dateOfBirth === 'MM/DD/YYYY') {
+    if (!formData.dateOfBirth || formData.dateOfBirth === '') {
       newErrors.dateOfBirth = 'Date of birth is required';
     }
     
@@ -59,12 +60,68 @@ const CompleteProfile = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
       console.log('Profile completion:', formData);
+      setIsCompleted(true);
     } catch (error) {
       console.error('Profile completion error:', error);
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Show success screen after profile completion
+  if (isCompleted) {
+    return (
+      <div className="min-h-screen flex">
+        {/* Left Section - Promotional/Branding */}
+        <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+          {/* Books Background Image */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: `url(${booksBackground})` }}
+          >
+            {/* Dark overlay for better text readability */}
+            <div className="absolute inset-0 bg-black bg-opacity-30"></div>
+          </div>
+          
+          {/* Content Overlay */}
+          <div className="relative z-10 flex items-center justify-center h-full w-full px-12">
+            <div className="text-center text-white max-w-md">
+              <h1 className="text-6xl font-extrabold mb-6 drop-shadow-lg">Storyloom</h1>
+              <div className="space-y-2 text-xl font-normal drop-shadow-md">
+                <p>Unlock Your Potential</p>
+                <p>Create Your Space</p>
+                <p>Connect With Your World</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Section - Success Message */}
+        <div className="w-full lg:w-1/2 bg-white flex items-center justify-center p-8">
+          <div className="w-full max-w-md text-center">
+            <div className="mb-8">
+              <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Profile Complete!</h2>
+              <p className="text-lg text-gray-600 mb-8">
+                Welcome to Storyloom! Your profile has been successfully created.
+              </p>
+            </div>
+            
+            <button
+              onClick={() => window.location.href = '/'}
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-darkbrown hover:bg-midbrown focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-midbrown transition-colors duration-200"
+            >
+              Get Started
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex">
@@ -130,16 +187,6 @@ const CompleteProfile = () => {
                 required
                 value={formData.fullName}
                 onChange={handleInputChange}
-                onFocus={(e) => {
-                  if (e.target.value === 'Full Name') {
-                    e.target.value = '';
-                  }
-                }}
-                onBlur={(e) => {
-                  if (e.target.value === '') {
-                    e.target.value = 'Full Name';
-                  }
-                }}
                 className={`block w-full px-3 py-3 border-b-2 focus:outline-none focus:border-midbrown transition-colors duration-200 placeholder-gray-400 ${
                   errors.fullName 
                     ? 'border-red-300 bg-red-50' 
@@ -165,16 +212,6 @@ const CompleteProfile = () => {
                 required
                 value={formData.phoneNumber}
                 onChange={handleInputChange}
-                onFocus={(e) => {
-                  if (e.target.value === '+254 710201985') {
-                    e.target.value = '';
-                  }
-                }}
-                onBlur={(e) => {
-                  if (e.target.value === '') {
-                    e.target.value = '+254 710201985';
-                  }
-                }}
                 className={`block w-full px-3 py-3 border-b-2 focus:outline-none focus:border-midbrown transition-colors duration-200 placeholder-gray-400 ${
                   errors.phoneNumber 
                     ? 'border-red-300 bg-red-50' 
@@ -205,6 +242,7 @@ const CompleteProfile = () => {
                       : 'border-midbrown'
                   }`}
                 >
+                  <option value="">Select Gender</option>
                   <option value="Female">Female</option>
                   <option value="Male">Male</option>
                   <option value="Other">Other</option>
@@ -231,7 +269,7 @@ const CompleteProfile = () => {
                 name="dateOfBirth"
                 type="date"
                 required
-                value={formData.dateOfBirth === 'MM/DD/YYYY' ? '' : formData.dateOfBirth}
+                value={formData.dateOfBirth}
                 onChange={handleInputChange}
                 className={`block w-full px-3 py-3 border-b-2 focus:outline-none focus:border-midbrown transition-colors duration-200 placeholder-gray-400 ${
                   errors.dateOfBirth 
@@ -246,7 +284,7 @@ const CompleteProfile = () => {
             </div>
 
             {/* Continue Button */}
-            <button
+            <button 
               type="submit"
               disabled={isLoading}
               className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-darkbrown hover:bg-midbrown focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-midbrown disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
@@ -270,4 +308,4 @@ const CompleteProfile = () => {
   );
 };
 
-export default CompleteProfile; 
+export default CompleteProfile;
