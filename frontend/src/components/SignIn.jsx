@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import booksBackground from '../assets/books-background.jpg';
 import CompleteProfile from './CreateAccount';
 import ForgotPassword from './ForgotPassword';
 
 const SignIn = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('signin');
   const [showProfile, setShowProfile] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
