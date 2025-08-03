@@ -176,7 +176,7 @@ const SignIn = () => {
       {/* Forgot Password */}
       <div className="text-sm text-center p-4">
         <a
-          className="font-bold text-darkbrown hover:text-midbrown transition-colors duration-200"
+          className="font-bold text-darkbrown hover:text-midbrown hover:cursor-pointer transition-colors duration-200"
           onClick={(e) => {
             e.preventDefault();
             setShowForgotPassword(true);

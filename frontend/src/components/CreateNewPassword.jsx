@@ -12,6 +12,7 @@ const CreateNewPassword = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -56,13 +57,81 @@ const CreateNewPassword = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
       console.log('Create new password:', formData);
-      // Here you would typically update the password and navigate to success
+      // Show success screen after successful password reset
+      setIsSuccess(true);
     } catch (error) {
       console.error('Create new password error:', error);
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Show success screen after password reset
+  if (isSuccess) {
+    return (
+      <div className="h-screen flex">
+        {/* Left Section - Clear Background */}
+        <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+          {/* Books Background Image */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: `url(${booksBackground})` }}
+          >
+            {/* Dark overlay for better text readability */}
+            <div className="absolute inset-0 bg-black bg-opacity-30"></div>
+          </div>
+          
+          {/* Content Overlay */}
+          <div className="relative z-10 flex items-center justify-center h-full w-full px-12">
+            <div className="text-center text-white max-w-md">
+              <h1 className="text-6xl font-extrabold mb-6 drop-shadow-lg">Storyloom</h1>
+              <div className="space-y-2 text-xl font-normal drop-shadow-md">
+                <p>Unlock Your Potential</p>
+                <p>Create Your Space</p>
+                <p>Connect With Your World</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Section - Success Screen with Blurred Background */}
+        <div className="w-full lg:w-1/2 relative">
+          {/* Blurred Background */}
+          <div className="absolute inset-0 bg-orange-50 blur-sm"></div>
+          
+          {/* Clear Success Content */}
+          <div className="relative z-10 flex items-center justify-center h-full p-8">
+            <div className="bg-cream rounded-3xl border-2 p-12 text-center max-w-md mx-4">
+              {/* Success Icon */}
+              <div className="flex justify-center mb-6">
+                <div className="w-28 h-24 bg-midbrown rounded-lg flex items-center justify-center">
+                  <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Success Heading */}
+              <h2 className="text-2xl font-bold text-midbrown mb-4">Reset password Successful!</h2>
+              
+              {/* Success Message */}
+              <p className="text-black mb-8">
+                Your password has been successfully changed.
+              </p>
+              
+              {/* Go to Home Button */}
+              <button
+                onClick={() => window.location.href = '/'}
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-3xl shadow-sm text-sm font-medium text-white bg-darkbrown hover:bg-midbrown focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-midbrown transition-colors duration-200"
+              >
+                Go to Home
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen flex">
