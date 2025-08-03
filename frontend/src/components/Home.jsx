@@ -75,7 +75,7 @@ const Home = () => {
   };
 
   const handleReadMore = (postId) => {
-    navigate(`/post/${postId}`);
+    navigate('/article');
   };
 
   const toggleDarkMode = () => {
@@ -89,7 +89,7 @@ const Home = () => {
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden p-2 rounded-md hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-md hover:bg-gray-100 transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
