@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import SignIn from './components/SignIn';
 import CreateArticle from './components/CreateArticle'; 
+import ExploreTopics from './components/ExploreTopics';
 
 function App() {
   return (
@@ -8,8 +9,8 @@ function App() {
       <Routes>
         <Route path="/" element={<SignIn />} />
         <Route path="/signin" element={<SignIn />} />
-        <Route path="/create-article" element={<CreateArticle />} />
         <Route path="/CreateArticle" element={<CreateArticle />} />
+        <Route path="/ExploreTopics" element={<ExploreTopics onClose={() => window.history.back()} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
