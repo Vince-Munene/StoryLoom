@@ -82,6 +82,9 @@ const SignIn = () => {
       // If signup is successful, show profile completion page
       if (activeTab === 'signup') {
         setShowProfile(true);
+      } else {
+        // If signin is successful, redirect to home page
+        navigate('/home');
       }
     } catch (error) {
       console.error(`${activeTab} error:`, error);

@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import booksBackground from '../assets/books-background.jpg';
 import avatar from '../assets/avatar-placeholder.svg';
 
 const CompleteProfile = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: '',
     phoneNumber: '',
@@ -112,7 +114,7 @@ const CompleteProfile = () => {
             </div>
             
             <button
-              onClick={() => window.location.href = '/'}
+              onClick={() => navigate('/home')}
               className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-darkbrown hover:bg-midbrown focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-midbrown transition-colors duration-200"
             >
               Get Started
