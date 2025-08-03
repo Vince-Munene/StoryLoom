@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import booksBackground from '../assets/books-background.jpg';
 import CompleteProfile from './CreateAccount';
+import ForgotPassword from './ForgotPassword';
 
 const SignIn = () => {
   const [activeTab, setActiveTab] = useState('signin');
   const [showProfile, setShowProfile] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -173,7 +175,13 @@ const SignIn = () => {
 
       {/* Forgot Password */}
       <div className="text-sm text-center p-4">
-        <a href="#" className="font-bold text-darkbrown hover:text-midbrown transition-colors duration-200">
+        <a
+          className="font-bold text-darkbrown hover:text-midbrown transition-colors duration-200"
+          onClick={(e) => {
+            e.preventDefault();
+            setShowForgotPassword(true);
+          }}
+        >
           Forgot password
         </a>
       </div>
@@ -376,6 +384,11 @@ const SignIn = () => {
   // Show profile completion page if signup was successful
   if (showProfile) {
     return <CompleteProfile />;
+  }
+
+  // Show ForgotPassword component if requested
+  if (showForgotPassword) {
+    return <ForgotPassword />;
   }
 
   return (
