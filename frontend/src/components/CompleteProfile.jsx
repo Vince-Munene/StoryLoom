@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import booksBackground from '../assets/books-background.jpg';
-import logo from '../assets/avatar-placeholder.svg';
+import avatar from '../assets/avatar-placeholder.svg';
 
 const CompleteProfile = () => {
   const [formData, setFormData] = useState({
@@ -168,7 +168,7 @@ const CompleteProfile = () => {
           {/* Profile Picture Placeholder */}
           <div className="flex justify-center mb-8">
             <div className="w-24 h-24 rounded-full flex items-center justify-center">
-              <img src={logo} alt="Logo" className="w-16 h-16 color-midbrown" />
+              <img src={avatar} alt="Logo" className="w-16 h-16 color-midbrown" />
             </div>
           </div>
 
