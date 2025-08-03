@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import booksBackground from '../assets/books-background.jpg';
+import CompleteProfile from './CompleteProfile';
 
 const SignIn = () => {
   const [activeTab, setActiveTab] = useState('signin');
+  const [showProfile, setShowProfile] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -72,6 +74,11 @@ const SignIn = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
       console.log(`${activeTab} attempt:`, formData);
+      
+      // If signup is successful, show profile completion page
+      if (activeTab === 'signup') {
+        setShowProfile(true);
+      }
     } catch (error) {
       console.error(`${activeTab} error:`, error);
     } finally {
@@ -94,7 +101,7 @@ const SignIn = () => {
           required
           value={formData.email}
           onChange={handleInputChange}
-          className={`block w-full px-3 py-3 border-b-2 focus:outline-none focus:border-midbrown transition-colors duration-200 ${
+          className={`block w-full px-3 py-3 border-b-2 focus:outline-none focus:border-midbrown transition-colors duration-200 placeholder-gray-400 ${
             errors.email 
               ? 'border-red-300 bg-red-50' 
               : 'border-midbrown'
@@ -120,7 +127,7 @@ const SignIn = () => {
             required
             value={formData.password}
             onChange={handleInputChange}
-            className={`block w-full px-3 py-3 pr-10 border-b-2 focus:outline-none focus:border-midbrown transition-colors duration-200 ${
+            className={`block w-full px-3 py-3 pr-10 border-b-2 focus:outline-none focus:border-midbrown transition-colors duration-200 placeholder-gray-400 ${
               errors.password 
                 ? 'border-red-300 bg-red-50' 
                 : 'border-midbrown'
@@ -207,7 +214,7 @@ const SignIn = () => {
           required
           value={formData.username}
           onChange={handleInputChange}
-          className={`block w-full px-3 py-3 border-b-2 focus:outline-none focus:border-midbrown transition-colors duration-200 ${
+          className={`block w-full px-3 py-3 border-b-2 focus:outline-none focus:border-midbrown transition-colors duration-200 placeholder-gray-400 ${
             errors.username 
               ? 'border-red-300 bg-red-50' 
               : 'border-midbrown'
@@ -232,7 +239,7 @@ const SignIn = () => {
           required
           value={formData.email}
           onChange={handleInputChange}
-          className={`block w-full px-3 py-3 border-b-2 focus:outline-none focus:border-midbrown transition-colors duration-200 ${
+          className={`block w-full px-3 py-3 border-b-2 focus:outline-none focus:border-midbrown transition-colors duration-200 placeholder-gray-400 ${
             errors.email 
               ? 'border-red-300 bg-red-50' 
               : 'border-midbrown'
@@ -258,7 +265,7 @@ const SignIn = () => {
             required
             value={formData.password}
             onChange={handleInputChange}
-            className={`block w-full px-3 py-3 pr-10 border-b-2 focus:outline-none focus:border-midbrown transition-colors duration-200 ${
+            className={`block w-full px-3 py-3 pr-10 border-b-2 focus:outline-none focus:border-midbrown transition-colors duration-200 placeholder-gray-400 ${
               errors.password 
                 ? 'border-red-300 bg-red-50' 
                 : 'border-midbrown'
@@ -301,7 +308,7 @@ const SignIn = () => {
             required
             value={formData.confirmPassword}
             onChange={handleInputChange}
-            className={`block w-full px-3 py-3 pr-10 border-b-2 focus:outline-none focus:border-midbrown transition-colors duration-200 ${
+            className={`block w-full px-3 py-3 pr-10 border-b-2 focus:outline-none focus:border-midbrown transition-colors duration-200 placeholder-gray-400 ${
               errors.confirmPassword 
                 ? 'border-red-300 bg-red-50' 
                 : 'border-midbrown'
@@ -365,6 +372,11 @@ const SignIn = () => {
       </button>
     </form>
   );
+
+  // Show profile completion page if signup was successful
+  if (showProfile) {
+    return <CompleteProfile />;
+  }
 
   return (
     <div className="min-h-screen flex">
