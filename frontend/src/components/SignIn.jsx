@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import booksBackground from '../assets/books-background.jpg';
 
 const SignIn = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('signin');
   const [formData, setFormData] = useState({
     username: '',
