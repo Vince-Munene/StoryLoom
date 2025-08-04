@@ -9,6 +9,8 @@ import avatar from '../assets/avatar-placeholder.svg';
 const Home = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
+  
+  console.log('Home component mounted, user:', user, 'isAuthenticated:', isAuthenticated);
   const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);

@@ -98,6 +98,7 @@ const SignIn = () => {
         });
         
         if (result.success) {
+          console.log('Login successful, navigating to /home');
           navigate('/home');
         } else {
           console.error('Login error:', result.error);
