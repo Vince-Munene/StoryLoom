@@ -52,6 +52,7 @@ export const AuthProvider = ({ children }) => {
       
       localStorage.setItem('token', token);
       setUser(userData);
+      console.log('User set in AuthContext:', userData);
       
       return { success: true };
     } catch (error) {
