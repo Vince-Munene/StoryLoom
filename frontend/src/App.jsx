@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import SignIn from './components/SignIn';
 import CreateAccount from './components/CreateAccount';
 import ForgotPassword from './components/ForgotPassword';
@@ -11,24 +11,65 @@ import Home from './components/Home';
 import Article from './components/Article';
 import Dashboard from './components/Dashboard';
 
+// Protected Route Component
+const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  }
+  
+  if (!user) {
+    return <Navigate to="/signin" replace />;
+  }
+  
+  return children;
+};
+
+// Public Route Component (redirects to home if already logged in)
+const PublicRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  }
+  
+  if (user) {
+    return <Navigate to="/home" replace />;
+  }
+  
+  return children;
+};
+
+function AppRoutes() {
+  return (
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/" element={<PublicRoute><SignIn /></PublicRoute>} />
+      <Route path="/signin" element={<PublicRoute><SignIn /></PublicRoute>} />
+      <Route path="/signup" element={<PublicRoute><CreateAccount /></PublicRoute>} />
+      <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+      <Route path="/reset-password/:token" element={<PublicRoute><CreateNewPassword /></PublicRoute>} />
+      
+      {/* Protected Routes */}
+      <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+      <Route path="/CreateArticle" element={<ProtectedRoute><CreateArticle /></ProtectedRoute>} />
+      <Route path="/exploreTopics" element={<ProtectedRoute><ExploreTopics onClose={() => window.history.back()} /></ProtectedRoute>} />
+      <Route path="/discover" element={<ProtectedRoute><Discover /></ProtectedRoute>} />
+      <Route path="/article/:id" element={<ProtectedRoute><Article /></ProtectedRoute>} />
+      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      
+      {/* Catch all route */}
+      <Route path="*" element={<Navigate to="/signin" replace />} />
+    </Routes>
+  );
+}
+
 function App() {
   return (
     <AuthProvider>
       <Router>
-        <Routes>
-          <Route path="/" element={<SignIn />} />
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<CreateAccount />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:token" element={<CreateNewPassword />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/CreateArticle" element={<CreateArticle />} />
-          <Route path="/exploreTopics" element={<ExploreTopics onClose={() => window.history.back()} />} />
-          <Route path="/discover" element={<Discover />} />
-          <Route path="/article/:id" element={<Article />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <AppRoutes />
       </Router>
     </AuthProvider>
   );

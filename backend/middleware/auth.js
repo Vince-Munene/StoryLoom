@@ -23,12 +23,15 @@ exports.protect = async (req, res, next) => {
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     console.log('Token verified successfully for user:', decoded.id);
+    console.log('JWT Secret:', process.env.JWT_SECRET ? 'Present' : 'Missing');
 
     // Get user from token
     const user = await User.findById(decoded.id).select('-password');
+    console.log('User found in database:', user ? 'Yes' : 'No');
 
     if (!user) {
       console.log('User not found for token:', decoded.id);
+      console.log('Available users in database:', await User.find().select('_id username email'));
       return res.status(401).json({
         status: 'error',
         message: 'User not found'
