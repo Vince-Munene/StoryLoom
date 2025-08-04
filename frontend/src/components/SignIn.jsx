@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import booksBackground from '../assets/books-background.jpg';
-import CompleteProfile from './CreateAccount';
+import CompleteProfile from './CompleteProfile';
 import ForgotPassword from './ForgotPassword';
 
 const SignIn = () => {
   const navigate = useNavigate();
+  const { login, signup, authError, clearError } = useAuth();
   const [activeTab, setActiveTab] = useState('signin');
   const [showProfile, setShowProfile] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
@@ -74,17 +76,32 @@ const SignIn = () => {
     if (!validateForm()) return;
     
     setIsLoading(true);
+    clearError(); // Clear any previous errors
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log(`${activeTab} attempt:`, formData);
-      
-      // If signup is successful, show profile completion page
       if (activeTab === 'signup') {
-        setShowProfile(true);
+        const result = await signup({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password
+        });
+        
+        if (result.success) {
+          setShowProfile(true);
+        } else {
+          console.error('Signup error:', result.error);
+        }
       } else {
-        // If signin is successful, redirect to home page
-        navigate('/home');
+        const result = await login({
+          email: formData.email,
+          password: formData.password
+        });
+        
+        if (result.success) {
+          navigate('/home');
+        } else {
+          console.error('Login error:', result.error);
+        }
       }
     } catch (error) {
       console.error(`${activeTab} error:`, error);
@@ -214,6 +231,21 @@ const SignIn = () => {
 
   const renderSignUpForm = () => (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Authentication Error Display */}
+      {authError && (
+        <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-red-800">{authError}</p>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Username Field */}
       <div>
         <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">

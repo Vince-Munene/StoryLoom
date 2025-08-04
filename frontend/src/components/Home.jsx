@@ -1,9 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { postsAPI } from '../services/api';
 import BlogBot from './BlogBot';
+import ProfilePictureUpload from './ProfilePictureUpload';
+import avatar from '../assets/avatar-placeholder.svg';
 
 const Home = () => {
   const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth();
   const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -12,6 +17,8 @@ const Home = () => {
   const [viewMode, setViewMode] = useState('grid');
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [showProfilePictureUpload, setShowProfilePictureUpload] = useState(false);
   const limit = 10;
 
   const mockPosts = [
@@ -43,16 +50,32 @@ const Home = () => {
     fetchPosts();
   }, [currentPage]);
 
+  // Close profile dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showProfileDropdown && !event.target.closest('.profile-dropdown')) {
+        setShowProfileDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showProfileDropdown]);
+
   const fetchPosts = async () => {
     setLoading(true);
     try {
+      const response = await postsAPI.getPosts(currentPage, limit);
+      setPosts(response.data.posts);
+      setTotalPages(response.data.pagination.totalPages);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      // Fallback to mock data if API fails
       const startIndex = (currentPage - 1) * limit;
       const endIndex = startIndex + limit;
       const paginatedPosts = mockPosts.slice(startIndex, endIndex);
       setPosts(paginatedPosts);
       setTotalPages(Math.ceil(mockPosts.length / limit));
-    } catch (error) {
-      console.error('Error fetching posts:', error);
     } finally {
       setLoading(false);
     }
@@ -75,12 +98,32 @@ const Home = () => {
   };
 
   const handleReadMore = (postId) => {
-    navigate('/article');
+    navigate(`/article/${postId}`);
   };
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/signin');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  const handleProfilePictureUpdate = (newAvatar) => {
+    // The user object will be updated automatically by the AuthContext
+    setShowProfileDropdown(false);
+  };
+
+  // Redirect to signin if not authenticated
+  if (!isAuthenticated) {
+    navigate('/signin');
+    return null;
+  }
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
@@ -126,8 +169,79 @@ const Home = () => {
                 </svg>
               )}
             </button>
-            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-sm font-medium text-gray-600">
-              A
+            <div className="relative">
+              <button
+                onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium text-white hover:opacity-80 transition-colors overflow-hidden"
+              >
+                {user?.avatar && user.avatar !== avatar ? (
+                  <img
+                    src={user.avatar}
+                    alt={user?.username || 'User'}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-orange-100 flex items-center justify-center text-orange-700">
+                    {user?.username?.charAt(0).toUpperCase() || 'U'}
+                  </div>
+                )}
+              </button>
+              
+              {/* Profile Dropdown */}
+              {showProfileDropdown && (
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-50 border border-gray-200 profile-dropdown">
+                  <div className="py-2">
+                    {/* Profile Header */}
+                    <div className="px-4 py-3 border-b border-gray-100">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+                          {user?.avatar && user.avatar !== avatar ? (
+                            <img
+                              src={user.avatar}
+                              alt={user?.username || 'User'}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-orange-100 flex items-center justify-center text-orange-700 font-medium">
+                              {user?.username?.charAt(0).toUpperCase() || 'U'}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">{user?.username}</p>
+                          <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Profile Actions */}
+                    <div className="py-1">
+                      <button
+                        onClick={() => {
+                          setShowProfilePictureUpload(true);
+                          setShowProfileDropdown(false);
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center space-x-2"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <span>Update Profile Picture</span>
+                      </button>
+                      
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center space-x-2"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -200,13 +314,13 @@ const Home = () => {
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-2">
                           <img
-                            src={post.author.avatar}
-                            alt={post.author.name}
+                            src={post.author?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face'}
+                            alt={post.author?.username || 'Unknown'}
                             className="w-8 h-8 rounded-full"
                           />
-                          <span className="text-sm text-gray-700">{post.author.name}</span>
+                          <span className="text-sm text-gray-700">{post.author?.username || 'Unknown'}</span>
                         </div>
-                        <span className="text-sm text-gray-500">{formatDate(post.date)}</span>
+                        <span className="text-sm text-gray-500">{formatDate(post.createdAt)}</span>
                       </div>
                       
                       <div className="flex items-center justify-between">
@@ -215,13 +329,13 @@ const Home = () => {
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                             </svg>
-                            <span>{post.likes}</span>
+                            <span>{post.likeCount || 0}</span>
                           </span>
                           <span className="flex items-center space-x-1">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                             </svg>
-                            <span>{post.comments}</span>
+                            <span>{post.commentCount || 0}</span>
                           </span>
                         </div>
                         <button 
@@ -294,9 +408,17 @@ const Home = () => {
       
       {/* BlogBot Chat Panel */}
       <BlogBot isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+      
+      {/* Profile Picture Upload Modal */}
+      {showProfilePictureUpload && (
+        <ProfilePictureUpload
+          onClose={() => setShowProfilePictureUpload(false)}
+          onUpdate={handleProfilePictureUpdate}
+        />
+      )}
       </main>
     </div>
   );
-};
-
-export default Home; 
+  };
+  
+  export default Home; 

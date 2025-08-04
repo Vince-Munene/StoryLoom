@@ -19,6 +19,9 @@ const CreateAccount = () => {
   const [showCompleteProfile, setShowCompleteProfile] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
+  // Test render
+  console.log('CreateAccount component loaded');
+
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({

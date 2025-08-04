@@ -1,75 +1,112 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link, useParams } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { postsAPI } from '../services/api';
 import BlogBot from './BlogBot';
 
 const Article = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const { user, isAuthenticated } = useAuth();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [commentSort, setCommentSort] = useState('top');
   const [newComment, setNewComment] = useState('');
+  const [article, setArticle] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const article = {
-    title: "The Top 5 Travel Destinations for 2025!",
-    category: "Travel",
-    image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&h=400&fit=crop",
-    author: {
-      name: "Natasha Wring",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=50&h=50&fit=crop&crop=face"
-    },
-    content: "The year 2025 is right around the corner, and when it comes the opportunity to explore new places, try new foods and meet new people. Whether you are a seasoned traveler or a newbie, there are plenty of destinations that will make your heart sing.",
-    likes: 357,
-    comments: 78,
-    date: "3 Days Ago"
-  };
+  // Fetch article data
+  useEffect(() => {
+    const fetchArticle = async () => {
+      if (!id) return;
+      
+      setLoading(true);
+      setError(null);
+      try {
+        console.log('Fetching article with ID:', id);
+        const response = await postsAPI.getPost(id);
+        console.log('Article response:', response);
+        if (response.status === 'success' && response.data.post) {
+          setArticle(response.data.post);
+        } else {
+          setError('Article not found');
+        }
+      } catch (error) {
+        console.error('Error fetching article:', error);
+        setError(error.message || 'Failed to load article');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const comments = [
-    {
-      id: 1,
-      user: "WatermelonSugar",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face",
-      comment: "I've been here as well, the first one is a must go for everyone",
-      likes: 360,
-      time: "2 weeks ago"
-    },
-    {
-      id: 2,
-      user: "ApexPredator",
-      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face",
-      comment: "Amazing destinations! I'm planning to visit at least 2 of these next year.",
-      likes: 245,
-      time: "1 week ago"
-    },
-    {
-      id: 3,
-      user: "Bubblegumm",
-      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face",
-      comment: "The photography in this article is absolutely stunning!",
-      likes: 189,
-      time: "5 days ago"
-    },
-    {
-      id: 4,
-      user: "ItsHailey",
-      avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=40&h=40&fit=crop&crop=face",
-      comment: "I've been to 3 of these places and they're all incredible. Great recommendations!",
-      likes: 156,
-      time: "3 days ago"
-    }
-  ];
+    fetchArticle();
+  }, [id]);
+
+  // Comments will be loaded from the article data
+  const comments = article?.comments || [];
+
+  // Optional: Show different UI for non-authenticated users
+  // But don't redirect - allow public article viewing
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
 
-  const handleSubmitComment = (e) => {
+  const handleSubmitComment = async (e) => {
     e.preventDefault();
-    if (newComment.trim()) {
-      // Handle comment submission
-      console.log('New comment:', newComment);
+    if (!newComment.trim()) return;
+    
+    // Check if user is authenticated before allowing comments
+    if (!isAuthenticated) {
+      alert('Please sign in to add comments');
+      return;
+    }
+    
+    try {
+      await postsAPI.addComment(id, newComment);
+      // Refresh article data to get updated comments
+      const response = await postsAPI.getPost(id);
+      setArticle(response.data.post);
       setNewComment('');
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      alert('Failed to add comment. Please try again.');
     }
   };
+
+  if (loading) {
+    return (
+      <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'} flex items-center justify-center`}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
+          <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Loading article...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && !article) {
+    return (
+      <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'} flex items-center justify-center`}>
+        <div className="text-center">
+          <p className={`text-red-600 mb-4`}>{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700"
+          >
+            Try Again
+          </button>
+          <button 
+            onClick={() => navigate('/home')}
+            className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 ml-2"
+          >
+            Go to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
@@ -129,31 +166,35 @@ const Article = () => {
             {/* Article Image */}
             <div className="relative">
               <img
-                src={article.image}
-                alt={article.title}
+                src={article?.image || "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&h=400&fit=crop"}
+                alt={article?.title || "Article"}
                 className="w-full h-96 object-cover"
               />
               <div className="absolute top-4 left-4">
                 <span className="px-3 py-1 bg-orange-100 text-orange-800 text-sm font-medium rounded-full">
-                  {article.category}
+                  {article?.category || "Travel"}
                 </span>
               </div>
             </div>
 
             {/* Article Content */}
             <div className="p-6">
-              <h1 className={`text-3xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{article.title}</h1>
+              <h1 className={`text-3xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                {article?.title || "The Top 5 Travel Destinations for 2025!"}
+              </h1>
               
               {/* Author Section */}
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-3">
                   <img
-                    src={article.author.avatar}
-                    alt={article.author.name}
+                    src={article?.author?.avatar || "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=50&h=50&fit=crop&crop=face"}
+                    alt={article?.author?.username || "Author"}
                     className="w-12 h-12 rounded-full"
                   />
                   <div>
-                    <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{article.author.name}</p>
+                    <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                      {article?.author?.username || "Natasha Wring"}
+                    </p>
                   </div>
                 </div>
                 <button className="px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-md hover:bg-orange-700 transition-colors">
@@ -162,27 +203,29 @@ const Article = () => {
               </div>
 
               {/* Article Text */}
-              <p className={`text-lg leading-relaxed mb-6 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                {article.content}
-              </p>
+              <div className={`prose max-w-none ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <p className="text-lg leading-relaxed mb-6">
+                  {article?.content || "The year 2025 is right around the corner, and when it comes the opportunity to explore new places, try new foods and meet new people. Whether you are a seasoned traveler or a newbie, there are plenty of destinations that will make your heart sing."}
+                </p>
+              </div>
 
-              {/* Engagement Metrics */}
-              <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                <div className="flex items-center space-x-6 text-gray-500">
+              {/* Article Stats */}
+              <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+                <div className="flex items-center space-x-6 text-sm text-gray-500">
                   <span className="flex items-center space-x-1">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                     </svg>
-                    <span>{article.likes}</span>
+                    <span>{article?.likeCount || 357}</span>
                   </span>
                   <span className="flex items-center space-x-1">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
-                    <span>{article.comments}</span>
+                    <span>{article?.commentCount || 78}</span>
                   </span>
                 </div>
-                <span className="text-gray-500">{article.date}</span>
+                <span className="text-gray-500">{article?.createdAt ? new Date(article.createdAt).toLocaleDateString() : "3 Days Ago"}</span>
               </div>
             </div>
           </article>
@@ -192,7 +235,9 @@ const Article = () => {
         <div className={`w-96 border-l p-6 ${
           isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
         }`}>
-          <h2 className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Comments ({article.comments})</h2>
+          <h2 className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+            Comments ({article?.commentCount || 78})
+          </h2>
           
           {/* Sort Buttons */}
           <div className="flex space-x-2 mb-6">
@@ -236,59 +281,81 @@ const Article = () => {
 
           {/* Comments List */}
           <div className="space-y-4 mb-6">
-            {comments.map((comment) => (
-              <div key={comment.id} className="flex space-x-3">
-                <img
-                  src={comment.avatar}
-                  alt={comment.user}
-                  className="w-8 h-8 rounded-full flex-shrink-0"
-                />
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                                         <p className={`font-medium text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{comment.user}</p>
-                    <button className="text-gray-400 hover:text-gray-600">
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                      </svg>
-                    </button>
-                  </div>
-                                     <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{comment.comment}</p>
-                                     <div className={`flex items-center space-x-4 mt-2 text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    <span className="flex items-center space-x-1">
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                      </svg>
-                      <span>{comment.likes}</span>
-                    </span>
-                    <span>{comment.time}</span>
+            {comments.length === 0 ? (
+              <p className={`text-center text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                No comments yet. Be the first to comment!
+              </p>
+            ) : (
+              comments.map((comment) => (
+                <div key={comment._id} className="flex space-x-3">
+                  <img
+                    src={comment.user?.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face"}
+                    alt={comment.user?.username || "User"}
+                    className="w-8 h-8 rounded-full flex-shrink-0"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <p className={`font-medium text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                        {comment.user?.username || "Anonymous"}
+                      </p>
+                      <button className="text-gray-400 hover:text-gray-600">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                        </svg>
+                      </button>
+                    </div>
+                    <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      {comment.content}
+                    </p>
+                    <div className={`flex items-center space-x-4 mt-2 text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      <span className="flex items-center space-x-1">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                        <span>{comment.likes?.length || 0}</span>
+                      </span>
+                      <span>{comment.createdAt ? new Date(comment.createdAt).toLocaleDateString() : "Just now"}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
 
           {/* Add Comment */}
-          <form onSubmit={handleSubmitComment} className="flex space-x-2">
-                         <input
-               type="text"
-               placeholder="Add a comment..."
-               value={newComment}
-               onChange={(e) => setNewComment(e.target.value)}
-               className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm ${
-                 isDarkMode 
-                   ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400' 
-                   : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-               }`}
-             />
-            <button
-              type="submit"
-              className="p-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
-            </button>
-          </form>
+          {isAuthenticated ? (
+            <form onSubmit={handleSubmitComment} className="flex space-x-2">
+              <input
+                type="text"
+                placeholder="Add a comment..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm ${
+                  isDarkMode 
+                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400' 
+                    : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                }`}
+              />
+              <button
+                type="submit"
+                className="p-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              </button>
+            </form>
+          ) : (
+            <div className={`text-center py-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              <p className="text-sm mb-2">Sign in to add a comment</p>
+              <button
+                onClick={() => navigate('/signin')}
+                className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors text-sm"
+              >
+                Sign In
+              </button>
+            </div>
+          )}
         </div>
       </main>
 
