@@ -88,7 +88,7 @@ const Home = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              onClick={() => navigate('/dashboard')}
               className="p-2 rounded-md hover:bg-gray-100 transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
