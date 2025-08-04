@@ -5,6 +5,7 @@ import ExploreTopics from './components/ExploreTopics';
 import Discover from './components/Discover';
 import Home from './components/Home';
 import Article from './components/Article';
+import Dashboard from './components/Dashboard';
 
 function App() {
   return (
@@ -14,9 +15,10 @@ function App() {
         <Route path="/signin" element={<SignIn />} />
         <Route path="/home" element={<Home />} />
         <Route path="/CreateArticle" element={<CreateArticle />} />
-        <Route path="/ExploreTopics" element={<ExploreTopics onClose={() => window.history.back()} />} />
+        <Route path="/exploreTopics" element={<ExploreTopics onClose={() => window.history.back()} />} />
         <Route path="/discover" element={<Discover />} />
         <Route path="/article" element={<Article />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
