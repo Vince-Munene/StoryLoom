@@ -36,6 +36,8 @@ export const AuthProvider = ({ children }) => {
             setUser(null);
           }
         }
+      } else {
+        console.log('No token found, user not authenticated');
       }
       setLoading(false);
     };

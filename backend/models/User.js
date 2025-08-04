@@ -67,13 +67,16 @@ userSchema.pre('save', async function(next) {
 
 // Sign JWT and return
 userSchema.methods.getSignedJwtToken = function() {
-  console.log('Generating JWT token with secret:', process.env.JWT_SECRET ? 'Present' : 'Missing');
+  console.log('Generating JWT token for user:', this._id);
+  console.log('JWT secret:', process.env.JWT_SECRET ? 'Present' : 'Missing');
   console.log('JWT expiration:', process.env.JWT_EXPIRE);
-  return jwt.sign(
+  const token = jwt.sign(
     { id: this._id, email: this.email, role: this.role },
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRE }
   );
+  console.log('Generated token payload:', jwt.decode(token));
+  return token;
 };
 
 // Match user entered password to hashed password in database
