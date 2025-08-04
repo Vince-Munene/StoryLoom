@@ -1,4 +1,8 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+let API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// Log the API base URL and environment variables for debugging
+if (API_BASE_URL != 'http://localhost:5000/api') {
+  API_BASE_URL = API_BASE_URL+ '/api'; // Ensure it ends with /api
+}
 console.log('API Base URL:', API_BASE_URL);
 console.log('Environment variables:', import.meta.env);
 

@@ -51,6 +51,22 @@ app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/users', userRoutes);
 
+// API root endpoint
+app.get('/api', (req, res) => {
+  res.status(200).json({ 
+    status: 'success', 
+    message: 'StoryLoom API is running',
+    version: '1.0.0',
+    endpoints: {
+      auth: '/api/auth',
+      posts: '/api/posts',
+      users: '/api/users',
+      health: '/api/health'
+    },
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({ 
