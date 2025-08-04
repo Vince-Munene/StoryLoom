@@ -21,11 +21,23 @@ const BlogBot = ({ isOpen, onClose }) => {
     scrollToBottom();
   }, [messages]);
 
+  const parseBotResponse = (response) => {
+    const jsonMatch = response.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    if (jsonMatch) {
+      try {
+        const parsed = JSON.parse(jsonMatch[1]);
+        return { type: "structured", data: parsed };
+      } catch (err) {
+        console.warn("Failed to parse JSON:", err);
+      }
+    }
+    return { type: "text", data: response };
+  };
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!inputMessage.trim()) return;
 
-    // Add user message
     const userMessage = {
       id: messages.length + 1,
       type: 'user',
@@ -34,43 +46,59 @@ const BlogBot = ({ isOpen, onClose }) => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const query = inputMessage;
     setInputMessage('');
     setIsTyping(true);
 
-    // Simulate bot response
-    setTimeout(() => {
-      const botResponse = {
+    try {
+      const res = await fetch("https://social-media-blog-0aw9.onrender.com/api/generate-blog", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query })
+      });
+
+      const data = await res.json();
+      const parsed = parseBotResponse(data.response);
+
+      const botMessage = {
         id: messages.length + 2,
         type: 'bot',
-        content: `I understand you're interested in ${inputMessage.toLowerCase()}. Let me help you find some great content about that topic. What specific aspect would you like to explore?`,
+        content: parsed.type === "structured" ? JSON.stringify(parsed.data, null, 2) : parsed.data,
         timestamp: new Date()
       };
-      setMessages(prev => [...prev, botResponse]);
+
+      setMessages(prev => [...prev, botMessage]);
+    } catch (err) {
+      console.error("Failed to fetch bot response:", err);
+      setMessages(prev => [
+        ...prev,
+        {
+          id: messages.length + 2,
+          type: 'bot',
+          content: "Oops! Something went wrong while fetching the blog. Please try again.",
+          timestamp: new Date()
+        }
+      ]);
+    } finally {
       setIsTyping(false);
-    }, 2000);
+    }
   };
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black bg-opacity-50"
-        onClick={onClose}
-      ></div>
-      
-      {/* Chat Panel */}
+      <div className="absolute inset-0 bg-black bg-opacity-50" onClick={onClose}></div>
+
       <div className="relative w-full max-w-md h-full bg-white flex flex-col">
-        {/* Header */}
         <div className="bg-orange-100 px-6 py-4 flex items-center justify-between border-b border-orange-200">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-full flex items-center justify-center">
-            <svg width="97" height="89" viewBox="0 0 97 89" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg width="97" height="89" viewBox="0 0 97 89" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M72.5625 59.8125C72.5625 64.6688 68.6687 68.5625 63.8125 68.5625C58.9562 68.5625 55.0625 64.6688 55.0625 59.8125C55.0625 54.9563 59 51.0625 63.8125 51.0625C68.625 51.0625 72.5625 55 72.5625 59.8125ZM33.1875 51.0625C28.375 51.0625 24.4375 55 24.4375 59.8125C24.4375 64.625 28.375 68.5625 33.1875 68.5625C38 68.5625 41.9375 64.6688 41.9375 59.8125C41.9375 54.9563 38.0438 51.0625 33.1875 51.0625ZM96.625 57.625V70.75C96.625 
                 73.1563 94.6562 75.125 92.25 75.125H87.875V79.5C87.875 84.3563 83.9812 88.25 79.125 88.25H17.875C15.5544 88.25 13.3288 87.3281 11.6878 85.6872C10.0469 84.0462 9.125 81.8207 9.125 79.5V75.125H4.75C2.34375 75.125 0.375 73.1563 0.375 70.75V57.625C0.375 55.2188 2.34375 53.25 4.75 53.25H9.125C9.125 36.3188 22.8188 22.625 39.75 22.625H44.125V17.0688C41.5 15.5813 39.75 12.7375 39.75 9.5C39.75 4.6875 43.6875 0.75 48.5 0.75C53.3125 0.75
                 57.25 4.6875 57.25 9.5C57.25 12.7375 55.5 15.5813 52.875 17.0688V22.625H57.25C74.1813 22.625 87.875 36.3188 87.875 53.25H92.25C94.6562 53.25 96.625 55.2188 96.625 57.625ZM87.875 62H79.125V53.25C79.125 41.175 69.325 31.375 57.25 31.375H39.75C27.675 31.375 17.875 41.175 17.875 53.25V62H9.125V66.375H17.875V79.5H79.125V66.375H87.875V62Z" fill="black"/>
-            </svg>
+              </svg>
             </div>
             <div>
               <h2 className="text-lg font-bold text-black">BlogBot</h2>
@@ -101,7 +129,6 @@ const BlogBot = ({ isOpen, onClose }) => {
                   </svg>
                 </div>
               )}
-              
               <div
                 className={`max-w-xs px-4 py-2 rounded-lg ${
                   message.type === 'user'
@@ -109,9 +136,8 @@ const BlogBot = ({ isOpen, onClose }) => {
                     : 'bg-orange-100 text-black'
                 }`}
               >
-                <p className="text-sm">{message.content}</p>
+                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
               </div>
-              
               {message.type === 'bot' && (
                 <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center ml-2 flex-shrink-0">
                   <span className="text-white text-sm font-bold">A</span>
@@ -119,7 +145,7 @@ const BlogBot = ({ isOpen, onClose }) => {
               )}
             </div>
           ))}
-          
+
           {/* Typing indicator */}
           {isTyping && (
             <div className="flex justify-start">
@@ -135,7 +161,6 @@ const BlogBot = ({ isOpen, onClose }) => {
               </div>
             </div>
           )}
-          
           <div ref={messagesEndRef} />
         </div>
 
@@ -165,4 +190,4 @@ const BlogBot = ({ isOpen, onClose }) => {
   );
 };
 
-export default BlogBot; 
+export default BlogBot;
