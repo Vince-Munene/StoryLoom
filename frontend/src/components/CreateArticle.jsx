@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { postsAPI } from '../services/api';
 import BlogBot from './BlogBot';
 
 const CreateArticle = ({ 
@@ -11,6 +13,7 @@ const CreateArticle = ({
   onClose = () => {}
 }) => {
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
     article: '',
@@ -106,37 +109,111 @@ const CreateArticle = ({
   };
 
   const handleSave = async () => {
+    if (!isAuthenticated) {
+      alert('Please sign in to save articles');
+      navigate('/signin');
+      return;
+    }
+
+    if (!formData.title.trim() || !formData.article.trim()) {
+      alert('Please fill in the title and article content');
+      return;
+    }
+
     setIsLoading(true);
     try {
-      console.log('Saving article:', formData);
-      await onSave(formData);
+      const postData = {
+        title: formData.title,
+        content: formData.article,
+        summary: formData.article.substring(0, 300) + (formData.article.length > 300 ? '...' : ''),
+        category: 'Other', // Default category
+        status: 'draft'
+      };
+
+      if (postId) {
+        // Update existing post
+        const response = await postsAPI.updatePost(postId, postData);
+        console.log('Post saved:', response);
+      } else {
+        // Create new post
+        const response = await postsAPI.createPost(postData);
+        console.log('Post saved:', response);
+      }
+
       setIsEditing(false);
+      alert('Article saved as draft!');
     } catch (error) {
       console.error('Save error:', error);
+      alert('Failed to save article. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handlePublish = async () => {
+    if (!isAuthenticated) {
+      alert('Please sign in to publish articles');
+      navigate('/signin');
+      return;
+    }
+
+    if (!formData.title.trim() || !formData.article.trim()) {
+      alert('Please fill in the title and article content');
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const publishData = { ...formData, isPublished: true };
-      console.log('Publishing article:', publishData);
-      await onPublish(publishData);
+      const postData = {
+        title: formData.title,
+        content: formData.article,
+        summary: formData.article.substring(0, 300) + (formData.article.length > 300 ? '...' : ''),
+        category: 'Other', // Default category
+        status: 'published',
+        author: user._id, // Use the logged-in user's ID
+        image: formData.coverImagePreview || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&h=400&fit=crop' // Use selected image or default
+      };
+
+      if (postId) {
+        // Update existing post
+        const response = await postsAPI.updatePost(postId, postData);
+        console.log('Post updated:', response);
+      } else {
+        // Create new post
+        const response = await postsAPI.createPost(postData);
+        console.log('Post created:', response);
+      }
+
       setFormData(prev => ({ ...prev, isPublished: true }));
+      alert('Article published successfully!');
+      navigate('/home');
     } catch (error) {
       console.error('Publish error:', error);
+      alert('Failed to publish article. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDelete = async () => {
+    if (!isAuthenticated) {
+      alert('Please sign in to delete articles');
+      navigate('/signin');
+      return;
+    }
+
+    if (!postId) {
+      alert('No article to delete');
+      return;
+    }
+
+    if (!window.confirm('Are you sure you want to delete this article? This action cannot be undone.')) {
+      return;
+    }
+
     setIsLoading(true);
     try {
-      console.log('Deleting article:', postId);
-      await onDelete(postId);
+      await postsAPI.deletePost(postId);
       
       // Reset everything back to default
       resetForm();
@@ -145,8 +222,11 @@ const CreateArticle = ({
       setShowDeleteSuccess(true);
       
       console.log('Article deleted and form reset to default');
+      alert('Article deleted successfully!');
+      navigate('/home');
     } catch (error) {
       console.error('Delete error:', error);
+      alert('Failed to delete article. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -260,6 +340,12 @@ const CreateArticle = ({
     };
     input.click();
   };
+
+  // Redirect to signin if not authenticated
+  if (!isAuthenticated) {
+    navigate('/signin');
+    return null;
+  }
 
   return (
     <div className={`h-screen flex flex-col ${isDarkMode ? 'bg-black' : 'bg-white'}`}>
