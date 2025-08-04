@@ -11,7 +11,7 @@ const Dashboard = () => {
     {
       id: 1,
       title: "How to improve blood flow",
-      image: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=300&h=200&fit=crop",
+      image: "https://images.unsplash.com/photo-1599585795426-3390ee964f96?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       author: "Dr. napoleon",
       time: "5 min ago",
       likes: 24,
@@ -20,7 +20,7 @@ const Dashboard = () => {
     {
       id: 2,
       title: "How to become an expert artist",
-      image: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=300&h=200&fit=crop",
+      image: "https://images.unsplash.com/photo-1650783756107-739513b38177?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       author: "carmelasan",
       time: "1 min ago",
       likes: 18,
@@ -34,24 +34,6 @@ const Dashboard = () => {
       time: "5 min ago",
       likes: 156,
       comments: 23
-    },
-    {
-      id: 4,
-      title: "Can I really go Hogwarts to learn magic?",
-      image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=300&h=200&fit=crop",
-      author: "dricolambder",
-      time: "5 min ago",
-      likes: 89,
-      comments: 12
-    },
-    {
-      id: 5,
-      title: "Can I really go Hogwarts to learn magic?",
-      image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=300&h=200&fit=crop",
-      author: "silo lavender",
-      time: "5 min ago",
-      likes: 67,
-      comments: 9
     }
   ];
 
@@ -73,15 +55,6 @@ const Dashboard = () => {
       time: "1 min ago",
       likes: 78,
       comments: 19
-    },
-    {
-      id: 3,
-      title: "Most Disappointing Final Bosses in Gaming History",
-      image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=200&fit=crop",
-      author: "ali",
-      time: "1 min ago",
-      likes: 92,
-      comments: 25
     }
   ];
 
@@ -98,7 +71,7 @@ const Dashboard = () => {
       {/* Header */}
       <header className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b px-6 py-4`}>
         <div className="flex items-center justify-between">
-          <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Storyloom</h1>
+          <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>StoryLoom</h1>
           <button
             onClick={handleClose}
             className={`p-2 rounded-md transition-colors ${
