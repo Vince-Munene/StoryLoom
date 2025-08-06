@@ -106,9 +106,9 @@ const Dashboard = () => {
         </div>
 
         {/* Recent Articles Section */}
-        <div className="max-w-7xl mx-auto mb-12">
-          <h2 className={`text-2xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Recent Articles</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="max-w-7xl mx-auto mb-8 sm:mb-12 px-4 sm:px-6">
+          <h2 className={`text-xl sm:text-2xl font-bold mb-4 sm:mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Recent Articles</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {recentArticles.map((article) => (
               <div
                 key={article._id}
@@ -150,9 +150,9 @@ const Dashboard = () => {
         </div>
 
         {/* My Articles Section */}
-        <div className="max-w-7xl mx-auto">
-          <h2 className={`text-2xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>My Articles</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <h2 className={`text-xl sm:text-2xl font-bold mb-4 sm:mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>My Articles</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {myArticles.map((article) => (
               <div
                 key={article._id}

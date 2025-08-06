@@ -430,7 +430,7 @@ const SignIn = () => {
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Left Section - Promotional/Branding */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
         {/* Books Background Image */}

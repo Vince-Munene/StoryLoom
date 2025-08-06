@@ -351,31 +351,33 @@ const CreateArticle = ({
   return (
     <div className={`h-screen flex flex-col ${isDarkMode ? 'bg-black' : 'bg-white'}`}>
       {/* Navigation Bar */}
-      <header className={`border-b ${isDarkMode ? 'border-gray-800 bg-gray-900' : 'border-gray-200 bg-white'} px-6 py-4`}>
+      <header className={`border-b ${isDarkMode ? 'border-gray-800 bg-gray-900' : 'border-gray-200 bg-white'} px-4 sm:px-6 py-4`}>
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-8">
-            <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>StoryLoom</h1>
-            <nav className="flex items-center space-x-6">
+          <div className="flex items-center space-x-2 sm:space-x-8">
+            <h1 className={`text-xl sm:text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>StoryLoom</h1>
+            <nav className="hidden md:flex items-center space-x-4 lg:space-x-6">
               <Link to="/home" className={`${isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>Home</Link>
               <Link to="/discover" className={`${isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>Explore</Link>
               <Link to="/CreateArticle" className={`${isDarkMode ? 'text-orange-400' : 'text-orange-600'} font-medium`}>Write</Link>
             </nav>
           </div>
           
-          <div className="flex items-center space-x-4">
-            <input
-              type="text"
-              placeholder="Search"
-              className={`px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent w-64 ${
-                isDarkMode 
-                  ? 'border-gray-700 bg-gray-800 text-white placeholder-gray-400' 
-                  : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-              }`}
-            />
-
-          <button className="px-6 py-2 bg-orange-600 text-white font-medium rounded-md hover:bg-orange-700 transition-colors">
-              SEARCH
-          </button>
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            {/* Search - Hidden on mobile */}
+            <div className="hidden sm:flex items-center space-x-2">
+              <input
+                type="text"
+                placeholder="Search"
+                className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent w-48 lg:w-64 ${
+                  isDarkMode 
+                    ? 'border-gray-700 bg-gray-800 text-white placeholder-gray-400' 
+                    : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                }`}
+              />
+              <button className="px-4 lg:px-6 py-2 bg-orange-600 text-white font-medium rounded-md hover:bg-orange-700 transition-colors text-sm lg:text-base">
+                SEARCH
+              </button>
+            </div>
 
             <button
               onClick={toggleTheme}
@@ -401,23 +403,23 @@ const CreateArticle = ({
       </header>
 
       {/* Main Header */}
-      <div className={`px-8 py-4 border-b ${isDarkMode ? 'border-gray-800' : 'border-gray-200'}`}>
-        <div className="flex justify-between items-center">
-          <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+      <div className={`px-4 sm:px-8 py-4 border-b ${isDarkMode ? 'border-gray-800' : 'border-gray-200'}`}>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
+          <h1 className={`text-xl sm:text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
             {isEditing ? 'Edit Article' : 'Create New Article'}
           </h1>
-          <div className="flex items-center space-x-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
             <button
               onClick={handleSave}
               disabled={isLoading}
-              className="px-6 py-2 bg-midbrown text-white font-medium rounded-lg hover:bg-darkbrown transition-colors duration-200 disabled:opacity-50"
+              className="px-4 sm:px-6 py-2 bg-midbrown text-white font-medium rounded-lg hover:bg-darkbrown transition-colors duration-200 disabled:opacity-50 text-sm sm:text-base"
             >
               {isLoading ? 'SAVING...' : 'SAVE'}
             </button>
             <button
               onClick={handlePublish}
               disabled={isLoading || formData.isPublished}
-              className={`px-6 py-2 font-medium rounded-lg transition-colors duration-200 disabled:opacity-50 ${
+              className={`px-4 sm:px-6 py-2 font-medium rounded-lg transition-colors duration-200 disabled:opacity-50 text-sm sm:text-base ${
                 isDarkMode 
                   ? 'bg-gray-800 text-white hover:bg-gray-700' 
                   : 'bg-gray-900 text-white hover:bg-gray-800'
@@ -484,9 +486,9 @@ const CreateArticle = ({
       </div>
 
       {/* Content Area */}
-      <div className="flex flex-1 p-6 gap-6 overflow-hidden">
+      <div className="flex flex-col lg:flex-row flex-1 p-4 sm:p-6 gap-4 sm:gap-6 overflow-hidden">
         {/* Left Column */}
-        <div className="flex-1 space-y-4">
+        <div className="flex-1 space-y-4 min-h-0">
           {/* Title Section */}
           <div>
             <label className={`block text-sm font-bold mb-1 ${
@@ -521,7 +523,7 @@ const CreateArticle = ({
                 : 'border-orange-200 bg-orange-50'
             }`}>
               {/* Toolbar */}
-              <div className={`flex items-center space-x-2 p-2 border-b rounded-t-lg ${
+              <div className={`flex items-center space-x-2 p-2 border-b rounded-t-lg overflow-x-auto ${
                 isDarkMode 
                   ? 'border-gray-700 bg-gray-900' 
                   : 'border-orange-200 bg-white'
@@ -649,7 +651,7 @@ const CreateArticle = ({
                 </button>
               </div>
               {/* Text Area */}
-              <div className="flex-1 p-3 border-0 rounded-b-lg focus:outline-none resize-none overflow-y-auto">
+              <div className="flex-1 p-3 border-0 rounded-b-lg focus:outline-none resize-none overflow-y-auto min-h-[300px] sm:min-h-[400px]">
                 <textarea
                   name="article"
                   value={formData.article}
@@ -695,7 +697,7 @@ const CreateArticle = ({
         </div>
 
         {/* Right Column */}
-        <div className="w-72 space-y-4">
+        <div className="w-full lg:w-72 space-y-4">
           {/* Author Section */}
           <div>
             <label className={`block text-sm font-bold mb-1 ${
@@ -709,7 +711,7 @@ const CreateArticle = ({
               value={formData.author}
               onChange={handleInputChange}
               placeholder="Your Name Goes Here..."
-              className={`w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-midbrown focus:border-transparent ${
+              className={`w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-midbrown focus:border-transparent text-sm sm:text-base ${
                 isDarkMode 
                   ? 'bg-gray-800 border border-gray-700 text-white placeholder-gray-400' 
                   : 'bg-orange-50 border border-orange-200 text-gray-900 placeholder-gray-500'
