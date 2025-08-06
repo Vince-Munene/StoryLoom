@@ -147,40 +147,51 @@ const Home = () => {
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-      <header className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b px-6 py-4 sticky top-0 z-50`}>
+      <header className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b px-4 sm:px-6 py-4 sticky top-0 z-50`}>
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             <button
               onClick={() => navigate('/dashboard')}
               className={`p-2 rounded-md transition-colors ${
                 isDarkMode ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'
               }`}
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>StoryLoom</h1>
-            <nav className="hidden lg:flex items-center space-x-6 ml-8">
+            <h1 className={`text-xl sm:text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>StoryLoom</h1>
+            <nav className="hidden md:flex items-center space-x-4 lg:space-x-6 ml-4 lg:ml-8">
               <Link to="/home" className="text-orange-600 font-medium">Home</Link>
               <Link to="/discover" className={`${isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>Explore</Link>
               <Link to="/CreateArticle" className={`${isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>Write</Link>
             </nav>
           </div>
           
-          <div className="flex items-center space-x-4">
-            <input
-              type="text"
-              placeholder="Search"
-              className={`px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent w-64 ${
-                isDarkMode 
-                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400' 
-                  : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-              }`}
-            />
-            <button className="px-6 py-2 bg-orange-600 text-white font-medium rounded-md hover:bg-orange-700 transition-colors">
-              SEARCH
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            {/* Search Bar - Hidden on mobile, visible on tablet and up */}
+            <div className="hidden sm:flex items-center space-x-2">
+              <input
+                type="text"
+                placeholder="Search"
+                className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent w-48 lg:w-64 ${
+                  isDarkMode 
+                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400' 
+                    : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                }`}
+              />
+              <button className="px-4 lg:px-6 py-2 bg-orange-600 text-white font-medium rounded-md hover:bg-orange-700 transition-colors text-sm lg:text-base">
+                SEARCH
+              </button>
+            </div>
+            
+            {/* Mobile Search Button */}
+            <button className="sm:hidden p-2 rounded-md transition-colors">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
             </button>
+            
             <button
               onClick={toggleDarkMode}
               className={`p-2 rounded-md transition-colors ${
@@ -197,6 +208,18 @@ const Home = () => {
                 </svg>
               )}
             </button>
+            
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="md:hidden p-2 rounded-md transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            
+            {/* Profile Button */}
             <div className="relative">
               <button
                 onClick={() => setShowProfileDropdown(!showProfileDropdown)}
@@ -308,48 +331,97 @@ const Home = () => {
         </div>
 
         {isMenuOpen && (
-          <div className={`lg:hidden mt-4 pb-4 border-t ${
+          <div className={`md:hidden mt-4 pb-4 border-t ${
             isDarkMode ? 'border-gray-700' : 'border-gray-200'
           }`}>
-            <nav className="flex flex-col space-y-2 pt-4">
-              <Link to="/home" className="text-orange-600 font-medium">Home</Link>
-              <Link to="/discover" className={`${isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>Explore</Link>
-              <Link to="/CreateArticle" className={`${isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>Write</Link>
+            {/* Mobile Search */}
+            <div className="mb-4 pt-4">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="text"
+                  placeholder="Search articles..."
+                  className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
+                    isDarkMode 
+                      ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400' 
+                      : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                  }`}
+                />
+                <button className="px-4 py-2 bg-orange-600 text-white font-medium rounded-md hover:bg-orange-700 transition-colors">
+                  Search
+                </button>
+              </div>
+            </div>
+            
+            {/* Mobile Navigation */}
+            <nav className="flex flex-col space-y-3 pt-2">
+              <Link 
+                to="/home" 
+                onClick={() => setIsMenuOpen(false)}
+                className={`px-3 py-2 rounded-md transition-colors ${
+                  isDarkMode 
+                    ? 'text-orange-400 hover:bg-gray-700' 
+                    : 'text-orange-600 hover:bg-gray-100'
+                } font-medium`}
+              >
+                Home
+              </Link>
+              <Link 
+                to="/discover" 
+                onClick={() => setIsMenuOpen(false)}
+                className={`px-3 py-2 rounded-md transition-colors ${
+                  isDarkMode 
+                    ? 'text-gray-300 hover:text-white hover:bg-gray-700' 
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                }`}
+              >
+                Explore
+              </Link>
+              <Link 
+                to="/CreateArticle" 
+                onClick={() => setIsMenuOpen(false)}
+                className={`px-3 py-2 rounded-md transition-colors ${
+                  isDarkMode 
+                    ? 'text-gray-300 hover:text-white hover:bg-gray-700' 
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                }`}
+              >
+                Write
+              </Link>
             </nav>
           </div>
         )}
       </header>
 
-      <main className="px-6 py-8">
+      <main className="px-4 sm:px-6 py-6 sm:py-8">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Latest Articles</h2>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 space-y-4 sm:space-y-0">
+            <h2 className={`text-2xl sm:text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Latest Articles</h2>
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-2 rounded-md ${
+                className={`p-2 rounded-md transition-colors ${
                   viewMode === 'grid' 
                     ? 'bg-orange-100 text-orange-600' 
                     : isDarkMode 
-                      ? 'bg-gray-700 text-gray-300' 
-                      : 'bg-gray-100 text-gray-600'
+                      ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                 </svg>
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-2 rounded-md ${
+                className={`p-2 rounded-md transition-colors ${
                   viewMode === 'list' 
                     ? 'bg-orange-100 text-orange-600' 
                     : isDarkMode 
-                      ? 'bg-gray-700 text-gray-300' 
-                      : 'bg-gray-100 text-gray-600'
+                      ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                 </svg>
               </button>

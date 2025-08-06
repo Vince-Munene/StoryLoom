@@ -67,34 +67,24 @@ const ProfilePictureUpload = ({ onClose, onUpdate }) => {
     setError('');
 
     try {
-      // Convert file to base64 for storage (in a real app, you'd upload to a server)
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const base64Image = e.target.result;
-        
-        // Update user profile with new avatar
-        console.log('Updating profile with avatar...');
-        try {
-          const result = await updateProfile({
-            avatar: base64Image
-          });
-          console.log('Profile update result:', result);
+      // Upload the actual file instead of converting to base64
+      console.log('Uploading profile picture...');
+      const result = await updateProfile({
+        avatar: selectedFile
+      });
+      console.log('Profile update result:', result);
 
-          if (result.success) {
-            onUpdate(base64Image);
-            onClose();
-          } else {
-            setError(result.error || 'Failed to update profile picture');
-          }
-        } catch (error) {
-          console.error('Profile update error:', error);
-          setError(error.message || 'Failed to update profile picture');
-        }
-      };
-      reader.readAsDataURL(selectedFile);
+      if (result.success) {
+        // Get the uploaded file URL from the response
+        const uploadedUrl = result.data?.user?.avatar || result.data?.avatar;
+        onUpdate(uploadedUrl);
+        onClose();
+      } else {
+        setError(result.error || 'Failed to update profile picture');
+      }
     } catch (error) {
       console.error('Upload error:', error);
-      setError('Failed to upload image');
+      setError(error.message || 'Failed to upload image');
     } finally {
       setIsUploading(false);
     }

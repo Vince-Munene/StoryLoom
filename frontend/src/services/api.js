@@ -81,19 +81,24 @@ export const authAPI = {
     
     // Add avatar if provided
     if (profileData.avatar) {
+      // If avatar is a File object, append it directly
+      if (profileData.avatar instanceof File) {
+        formData.append('image', profileData.avatar);
+      }
       // If avatar is a base64 string, convert it to a file
-      if (typeof profileData.avatar === 'string' && profileData.avatar.startsWith('data:')) {
+      else if (typeof profileData.avatar === 'string' && profileData.avatar.startsWith('data:')) {
         try {
           const response = await fetch(profileData.avatar);
           const blob = await response.blob();
-          formData.append('image', blob, 'avatar.jpg'); // Changed from 'avatar' to 'image'
+          formData.append('image', blob, 'avatar.jpg');
         } catch (error) {
           console.error('Error converting base64 to blob:', error);
           // If conversion fails, send as text field
           formData.append('avatar', profileData.avatar);
         }
       } else {
-        formData.append('image', profileData.avatar); // Changed from 'avatar' to 'image'
+        // Handle as text field (URL or other string)
+        formData.append('avatar', profileData.avatar);
       }
     }
     
