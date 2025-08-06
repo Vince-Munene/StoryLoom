@@ -39,6 +39,7 @@ const Home = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showProfilePictureUpload, setShowProfilePictureUpload] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const limit = 10;
 
   const mockPosts = [
@@ -68,7 +69,7 @@ const Home = () => {
 
   useEffect(() => {
     fetchPosts();
-  }, [currentPage]);
+  }, [currentPage, searchQuery]);
 
   // Close profile dropdown when clicking outside
   useEffect(() => {
@@ -85,17 +86,29 @@ const Home = () => {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const response = await postsAPI.getPosts(currentPage, limit);
+      const response = await postsAPI.getPosts(currentPage, limit, searchQuery);
       setPosts(response.data.posts);
       setTotalPages(response.data.pagination.totalPages);
     } catch (error) {
       console.error('Error fetching posts:', error);
       // Fallback to mock data if API fails
+      let filteredPosts = mockPosts;
+      
+      // Filter mock posts by search query if provided
+      if (searchQuery.trim()) {
+        filteredPosts = mockPosts.filter(post => 
+          post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          post.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          post.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          post.author.name.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
+      
       const startIndex = (currentPage - 1) * limit;
       const endIndex = startIndex + limit;
-      const paginatedPosts = mockPosts.slice(startIndex, endIndex);
+      const paginatedPosts = filteredPosts.slice(startIndex, endIndex);
       setPosts(paginatedPosts);
-      setTotalPages(Math.ceil(mockPosts.length / limit));
+      setTotalPages(Math.ceil(filteredPosts.length / limit));
     } finally {
       setLoading(false);
     }
@@ -139,6 +152,21 @@ const Home = () => {
     setShowProfileDropdown(false);
   };
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setCurrentPage(1); // Reset to first page when searching
+    fetchPosts();
+  };
+
+  const handleSearchInputChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const clearSearch = () => {
+    setSearchQuery('');
+    setCurrentPage(1);
+  };
+
   // Redirect to signin if not authenticated
   if (!isAuthenticated) {
     navigate('/signin');
@@ -169,21 +197,41 @@ const Home = () => {
           </div>
           
           <div className="flex items-center space-x-2 sm:space-x-4">
-            {/* Search Bar - Hidden on mobile, visible on tablet and up */}
-            <div className="hidden sm:flex items-center space-x-2">
-              <input
-                type="text"
-                placeholder="Search"
-                className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent w-48 lg:w-64 ${
-                  isDarkMode 
-                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400' 
-                    : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-                }`}
-              />
-              <button className="px-4 lg:px-6 py-2 bg-orange-600 text-white font-medium rounded-md hover:bg-orange-700 transition-colors text-sm lg:text-base">
-                SEARCH
-              </button>
-            </div>
+                         {/* Search Bar - Hidden on mobile, visible on tablet and up */}
+             <form onSubmit={handleSearch} className="hidden sm:flex items-center space-x-2">
+               <div className="relative">
+                 <input
+                   type="text"
+                   placeholder="Search articles..."
+                   value={searchQuery}
+                   onChange={handleSearchInputChange}
+                   className={`px-3 py-2 pr-8 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent w-48 lg:w-64 ${
+                     isDarkMode 
+                       ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400' 
+                       : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                   }`}
+                 />
+                 {searchQuery && (
+                   <button
+                     type="button"
+                     onClick={clearSearch}
+                     className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded-full ${
+                       isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-400 hover:text-gray-600'
+                     }`}
+                   >
+                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                     </svg>
+                   </button>
+                 )}
+               </div>
+               <button 
+                 type="submit"
+                 className="px-4 lg:px-6 py-2 bg-orange-600 text-white font-medium rounded-md hover:bg-orange-700 transition-colors text-sm lg:text-base"
+               >
+                 SEARCH
+               </button>
+             </form>
             
             {/* Mobile Search Button */}
             <button className="sm:hidden p-2 rounded-md transition-colors">
@@ -334,23 +382,43 @@ const Home = () => {
           <div className={`md:hidden mt-4 pb-4 border-t ${
             isDarkMode ? 'border-gray-700' : 'border-gray-200'
           }`}>
-            {/* Mobile Search */}
-            <div className="mb-4 pt-4">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="text"
-                  placeholder="Search articles..."
-                  className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-                    isDarkMode 
-                      ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400' 
-                      : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-                  }`}
-                />
-                <button className="px-4 py-2 bg-orange-600 text-white font-medium rounded-md hover:bg-orange-700 transition-colors">
-                  Search
-                </button>
-              </div>
-            </div>
+                         {/* Mobile Search */}
+             <form onSubmit={handleSearch} className="mb-4 pt-4">
+               <div className="flex items-center space-x-2">
+                 <div className="relative flex-1">
+                   <input
+                     type="text"
+                     placeholder="Search articles..."
+                     value={searchQuery}
+                     onChange={handleSearchInputChange}
+                     className={`w-full px-3 py-2 pr-8 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
+                       isDarkMode 
+                         ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400' 
+                         : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                     }`}
+                   />
+                   {searchQuery && (
+                     <button
+                       type="button"
+                       onClick={clearSearch}
+                       className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded-full ${
+                         isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-400 hover:text-gray-600'
+                       }`}
+                     >
+                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                       </svg>
+                     </button>
+                   )}
+                 </div>
+                 <button 
+                   type="submit"
+                   className="px-4 py-2 bg-orange-600 text-white font-medium rounded-md hover:bg-orange-700 transition-colors"
+                 >
+                   Search
+                 </button>
+               </div>
+             </form>
             
             {/* Mobile Navigation */}
             <nav className="flex flex-col space-y-3 pt-2">
@@ -395,7 +463,16 @@ const Home = () => {
       <main className="px-4 sm:px-6 py-6 sm:py-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 space-y-4 sm:space-y-0">
-            <h2 className={`text-2xl sm:text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Latest Articles</h2>
+            <div>
+              <h2 className={`text-2xl sm:text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                {searchQuery ? `Search Results for "${searchQuery}"` : 'Latest Articles'}
+              </h2>
+              {searchQuery && (
+                <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Found {posts.length} result{posts.length !== 1 ? 's' : ''}
+                </p>
+              )}
+            </div>
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => setViewMode('grid')}
@@ -428,11 +505,26 @@ const Home = () => {
             </div>
           </div>
 
-          {loading ? (
-            <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
-            </div>
-          ) : (
+                     {loading ? (
+             <div className="flex justify-center items-center py-12">
+               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+             </div>
+           ) : posts.length === 0 && searchQuery ? (
+             <div className="text-center py-12">
+               <div className={`text-lg font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                 No articles found for "{searchQuery}"
+               </div>
+               <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                 Try adjusting your search terms or browse all articles
+               </p>
+               <button
+                 onClick={clearSearch}
+                 className="mt-4 px-4 py-2 bg-orange-600 text-white font-medium rounded-md hover:bg-orange-700 transition-colors"
+               >
+                 Clear Search
+               </button>
+             </div>
+           ) : (
             <>
               <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
                 {posts.map((post) => (
