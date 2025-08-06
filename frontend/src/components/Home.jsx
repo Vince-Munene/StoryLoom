@@ -129,22 +129,24 @@ const Home = () => {
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-      <header className="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-50">
+      <header className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b px-6 py-4 sticky top-0 z-50`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <button
               onClick={() => navigate('/dashboard')}
-              className="p-2 rounded-md hover:bg-gray-100 transition-colors"
+              className={`p-2 rounded-md transition-colors ${
+                isDarkMode ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'
+              }`}
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <h1 className="text-2xl font-bold text-gray-900">StoryLoom</h1>
+            <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>StoryLoom</h1>
             <nav className="hidden lg:flex items-center space-x-6 ml-8">
               <Link to="/home" className="text-orange-600 font-medium">Home</Link>
-              <Link to="/discover" className="text-gray-600 hover:text-gray-900 transition-colors">Explore</Link>
-              <Link to="/CreateArticle" className="text-gray-600 hover:text-gray-900 transition-colors">Write</Link>
+              <Link to="/discover" className={`${isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>Explore</Link>
+              <Link to="/CreateArticle" className={`${isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>Write</Link>
             </nav>
           </div>
           
@@ -152,14 +154,20 @@ const Home = () => {
             <input
               type="text"
               placeholder="Search"
-              className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent w-64"
+              className={`px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent w-64 ${
+                isDarkMode 
+                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400' 
+                  : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+              }`}
             />
             <button className="px-6 py-2 bg-orange-600 text-white font-medium rounded-md hover:bg-orange-700 transition-colors">
               SEARCH
             </button>
             <button
               onClick={toggleDarkMode}
-              className="p-2 rounded-md hover:bg-gray-100 transition-colors"
+              className={`p-2 rounded-md transition-colors ${
+                isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+              }`}
             >
               {isDarkMode ? (
                 <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
@@ -191,10 +199,16 @@ const Home = () => {
               
               {/* Profile Dropdown */}
               {showProfileDropdown && (
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-50 border border-gray-200 profile-dropdown">
+                <div className={`absolute right-0 mt-2 w-64 rounded-md shadow-lg z-50 border profile-dropdown ${
+                  isDarkMode 
+                    ? 'bg-gray-800 border-gray-700' 
+                    : 'bg-white border-gray-200'
+                }`}>
                   <div className="py-2">
                     {/* Profile Header */}
-                    <div className="px-4 py-3 border-b border-gray-100">
+                    <div className={`px-4 py-3 border-b ${
+                      isDarkMode ? 'border-gray-700' : 'border-gray-100'
+                    }`}>
                       <div className="flex items-center space-x-3">
                         <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
                           {user?.avatar && user.avatar !== avatar ? (
@@ -210,8 +224,12 @@ const Home = () => {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">{user?.username}</p>
-                          <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                          <p className={`text-sm font-medium truncate ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                          }`}>{user?.username}</p>
+                          <p className={`text-xs truncate ${
+                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                          }`}>{user?.email}</p>
                         </div>
                       </div>
                     </div>
@@ -223,7 +241,11 @@ const Home = () => {
                           setShowProfilePictureUpload(true);
                           setShowProfileDropdown(false);
                         }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center space-x-2"
+                        className={`w-full text-left px-4 py-2 text-sm transition-colors flex items-center space-x-2 ${
+                          isDarkMode 
+                            ? 'text-gray-300 hover:bg-gray-700' 
+                            : 'text-gray-700 hover:bg-gray-100'
+                        }`}
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -233,7 +255,11 @@ const Home = () => {
                       
                       <button
                         onClick={handleLogout}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center space-x-2"
+                        className={`w-full text-left px-4 py-2 text-sm transition-colors flex items-center space-x-2 ${
+                          isDarkMode 
+                            ? 'text-gray-300 hover:bg-gray-700' 
+                            : 'text-gray-700 hover:bg-gray-100'
+                        }`}
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -249,11 +275,13 @@ const Home = () => {
         </div>
 
         {isMenuOpen && (
-          <div className="lg:hidden mt-4 pb-4 border-t border-gray-200">
+          <div className={`lg:hidden mt-4 pb-4 border-t ${
+            isDarkMode ? 'border-gray-700' : 'border-gray-200'
+          }`}>
             <nav className="flex flex-col space-y-2 pt-4">
               <Link to="/home" className="text-orange-600 font-medium">Home</Link>
-              <Link to="/discover" className="text-gray-600 hover:text-gray-900 transition-colors">Explore</Link>
-              <Link to="/CreateArticle" className="text-gray-600 hover:text-gray-900 transition-colors">Write</Link>
+              <Link to="/discover" className={`${isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>Explore</Link>
+              <Link to="/CreateArticle" className={`${isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>Write</Link>
             </nav>
           </div>
         )}
@@ -266,7 +294,13 @@ const Home = () => {
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-2 rounded-md ${viewMode === 'grid' ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-600'}`}
+                className={`p-2 rounded-md ${
+                  viewMode === 'grid' 
+                    ? 'bg-orange-100 text-orange-600' 
+                    : isDarkMode 
+                      ? 'bg-gray-700 text-gray-300' 
+                      : 'bg-gray-100 text-gray-600'
+                }`}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -274,7 +308,13 @@ const Home = () => {
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-2 rounded-md ${viewMode === 'list' ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-600'}`}
+                className={`p-2 rounded-md ${
+                  viewMode === 'list' 
+                    ? 'bg-orange-100 text-orange-600' 
+                    : isDarkMode 
+                      ? 'bg-gray-700 text-gray-300' 
+                      : 'bg-gray-100 text-gray-600'
+                }`}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
@@ -412,8 +452,8 @@ const Home = () => {
         </button>
       </div>
       
-      {/* BlogBot Chat Panel */}
-      <BlogBot isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+             {/* BlogBot Chat Panel */}
+       <BlogBot isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} isDarkMode={isDarkMode} />
       
       {/* Profile Picture Upload Modal */}
       {showProfilePictureUpload && (
