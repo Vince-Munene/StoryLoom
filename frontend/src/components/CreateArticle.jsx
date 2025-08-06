@@ -665,7 +665,8 @@ const CreateArticle = ({
                   }`}
                   style={{ 
                     minHeight: '200px',
-                    whiteSpace: 'pre-wrap'
+                    whiteSpace: 'pre-wrap',
+                    textAlign: textFormatting.alignment
                   }}
                 >
                   {formData.article}
