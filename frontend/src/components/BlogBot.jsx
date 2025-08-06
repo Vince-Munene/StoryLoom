@@ -23,9 +23,9 @@ const BlogBot = ({ isOpen, onClose }) => {
 
 const parseBotResponse = (response) => {
   // Expecting an object like { response: { ... } }
-  if (!response || typeof response !== "object" || !response.response) {
-    return { type: "text", data: "Unexpected response format." };
-  }
+  // if (!response || typeof response !== "object" || !response.response) {
+  //   return { type: "text", data: "Unexpected response format." };
+  // }
 
   const { message, title, content, hashtags } = response.response;
 
@@ -40,7 +40,7 @@ const parseBotResponse = (response) => {
     return { type: "text", data: formatted };
   }
 
-  return { type: "text", data: "I'm not sure how to respond to that." };
+  return { type: "text", data: "responce not processed." };
 };
 
 
