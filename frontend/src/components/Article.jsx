@@ -4,6 +4,25 @@ import { useAuth } from '../contexts/AuthContext';
 import { postsAPI } from '../services/api';
 import BlogBot from './BlogBot';
 
+// Helper function to get full avatar URL
+const getAvatarUrl = (avatar) => {
+  if (!avatar) return null;
+  
+  // If it's already a full URL (starts with http), return as is
+  if (avatar.startsWith('http')) {
+    return avatar;
+  }
+  
+  // If it's a relative path (starts with /), prepend the API base URL
+  if (avatar.startsWith('/')) {
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    return `${baseUrl}${avatar}`;
+  }
+  
+  // Otherwise return as is (could be base64 or other format)
+  return avatar;
+};
+
 const Article = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -311,9 +330,13 @@ const Article = () => {
               comments.map((comment) => (
                 <div key={comment._id} className="flex space-x-3">
                   <img
-                    src={comment.user?.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face"}
+                    src={getAvatarUrl(comment.user?.avatar) || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face"}
                     alt={comment.user?.username || "User"}
                     className="w-8 h-8 rounded-full flex-shrink-0"
+                    onError={(e) => {
+                      // Fallback to default avatar if image fails to load
+                      e.target.src = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face";
+                    }}
                   />
                   <div className="flex-1">
                     <div className="flex items-center justify-between">

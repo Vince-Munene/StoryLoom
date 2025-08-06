@@ -1,11 +1,29 @@
 import { useState, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import avatar from '../assets/avatar-placeholder.svg';
+
+// Helper function to get full avatar URL
+const getAvatarUrl = (avatar) => {
+  if (!avatar) return null;
+  
+  // If it's already a full URL (starts with http), return as is
+  if (avatar.startsWith('http')) {
+    return avatar;
+  }
+  
+  // If it's a relative path (starts with /), prepend the API base URL
+  if (avatar.startsWith('/')) {
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    return `${baseUrl}${avatar}`;
+  }
+  
+  // Otherwise return as is (could be base64 or other format)
+  return avatar;
+};
 
 const ProfilePictureUpload = ({ onClose, onUpdate }) => {
   const { user, updateProfile } = useAuth();
   const [selectedFile, setSelectedFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(user?.avatar || avatar);
+  const [previewUrl, setPreviewUrl] = useState(user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face');
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState('');
   const fileInputRef = useRef(null);
@@ -93,9 +111,9 @@ const ProfilePictureUpload = ({ onClose, onUpdate }) => {
       console.log('Remove result:', result);
 
       if (result.success) {
-        setPreviewUrl(avatar);
+        setPreviewUrl('https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face');
         setSelectedFile(null);
-        onUpdate(avatar);
+                  onUpdate('https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face');
       } else {
         setError(result.error || 'Failed to remove profile picture');
       }
@@ -115,7 +133,12 @@ const ProfilePictureUpload = ({ onClose, onUpdate }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-gray-900">Update Profile Picture</h2>
+          <h2 className="text-xl font-bold text-gray-900">
+            {user?.avatar && user.avatar !== 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face' 
+              ? 'Update Profile Picture' 
+              : 'Add Profile Picture'
+            }
+          </h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -130,9 +153,13 @@ const ProfilePictureUpload = ({ onClose, onUpdate }) => {
         <div className="flex justify-center mb-6">
           <div className="relative">
             <img
-              src={previewUrl}
+              src={getAvatarUrl(previewUrl)}
               alt="Profile Preview"
               className="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
+              onError={(e) => {
+                // Fallback to default avatar if image fails to load
+                e.target.src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
+              }}
             />
             {selectedFile && (
               <div className="absolute -bottom-2 -right-2 bg-green-500 rounded-full p-1">
@@ -179,7 +206,7 @@ const ProfilePictureUpload = ({ onClose, onUpdate }) => {
             </button>
           )}
 
-          {user?.avatar && user.avatar !== avatar && (
+          {user?.avatar && user.avatar !== 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face' && (
             <button
               onClick={handleRemove}
               disabled={isUploading}

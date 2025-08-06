@@ -4,7 +4,25 @@ import { useAuth } from '../contexts/AuthContext';
 import { postsAPI } from '../services/api';
 import BlogBot from './BlogBot';
 import ProfilePictureUpload from './ProfilePictureUpload';
-import avatar from '../assets/avatar-placeholder.svg';
+
+// Helper function to get full avatar URL
+const getAvatarUrl = (avatar) => {
+  if (!avatar) return null;
+  
+  // If it's already a full URL (starts with http), return as is
+  if (avatar.startsWith('http')) {
+    return avatar;
+  }
+  
+  // If it's a relative path (starts with /), prepend the API base URL
+  if (avatar.startsWith('/')) {
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    return `${baseUrl}${avatar}`;
+  }
+  
+  // Otherwise return as is (could be base64 or other format)
+  return avatar;
+};
 
 const Home = () => {
   const navigate = useNavigate();
@@ -184,11 +202,16 @@ const Home = () => {
                 onClick={() => setShowProfileDropdown(!showProfileDropdown)}
                 className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium text-white hover:opacity-80 transition-colors overflow-hidden"
               >
-                {user?.avatar && user.avatar !== avatar ? (
+                {user?.avatar && user.avatar !== 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face' ? (
                   <img
-                    src={user.avatar}
+                    src={getAvatarUrl(user.avatar)}
                     alt={user?.username || 'User'}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      // Fallback to initial if image fails to load
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
                   />
                 ) : (
                   <div className="w-full h-full bg-orange-100 flex items-center justify-center text-orange-700">
@@ -211,11 +234,16 @@ const Home = () => {
                     }`}>
                       <div className="flex items-center space-x-3">
                         <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
-                          {user?.avatar && user.avatar !== avatar ? (
+                          {user?.avatar && user.avatar !== 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face' ? (
                             <img
-                              src={user.avatar}
+                              src={getAvatarUrl(user.avatar)}
                               alt={user?.username || 'User'}
                               className="w-full h-full object-cover"
+                              onError={(e) => {
+                                // Fallback to initial if image fails to load
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'flex';
+                              }}
                             />
                           ) : (
                             <div className="w-full h-full bg-orange-100 flex items-center justify-center text-orange-700 font-medium">
@@ -250,7 +278,12 @@ const Home = () => {
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
-                        <span>Update Profile Picture</span>
+                        <span>
+                          {user?.avatar && user.avatar !== 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face' 
+                            ? 'Update Profile Picture' 
+                            : 'Add Profile Picture'
+                          }
+                        </span>
                       </button>
                       
                       <button
