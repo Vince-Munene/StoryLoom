@@ -21,18 +21,28 @@ const BlogBot = ({ isOpen, onClose }) => {
     scrollToBottom();
   }, [messages]);
 
-  const parseBotResponse = (response) => {
-    const jsonMatch = response.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-    if (jsonMatch) {
-      try {
-        const parsed = JSON.parse(jsonMatch[1]);
-        return { type: "structured", data: parsed };
-      } catch (err) {
-        console.warn("Failed to parse JSON:", err);
-      }
-    }
-    return { type: "text", data: response };
-  };
+const parseBotResponse = (response) => {
+  // Expecting an object like { response: { ... } }
+  if (!response || typeof response !== "object" || !response.response) {
+    return { type: "text", data: "Unexpected response format." };
+  }
+
+  const { message, title, content, hashtags } = response.response;
+
+  // Format 1: Simple message
+  if (message) {
+    return { type: "text", data: message };
+  }
+
+  // Format 2: Structured blog response
+  if (title && content && hashtags) {
+    const formatted = `Title: ${title}\n\n${content}\n\nHashtags: ${hashtags}`;
+    return { type: "text", data: formatted };
+  }
+
+  return { type: "text", data: "I'm not sure how to respond to that." };
+};
+
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
