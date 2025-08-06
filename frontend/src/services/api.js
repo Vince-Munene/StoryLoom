@@ -11,8 +11,18 @@ const handleResponse = async (response) => {
   const data = await response.json();
   
   if (!response.ok) {
-    // Always throw error for all non-ok responses, including 401/403
-    throw new Error(data.message || 'Something went wrong');
+    // Provide more specific error messages based on status code
+    if (response.status === 404) {
+      throw new Error(data.message || 'Resource not found');
+    } else if (response.status === 401) {
+      throw new Error(data.message || 'Unauthorized');
+    } else if (response.status === 403) {
+      throw new Error(data.message || 'Forbidden');
+    } else if (response.status === 500) {
+      throw new Error(data.message || 'Server error');
+    } else {
+      throw new Error(data.message || 'Something went wrong');
+    }
   }
   
   return data;

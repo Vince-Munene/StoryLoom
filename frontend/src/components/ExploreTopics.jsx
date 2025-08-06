@@ -68,7 +68,7 @@ const ExploreTopics = ({ onClose }) => {
   const mockArticles = {
     'Travel': [
       {
-        id: 1,
+        _id: 1,
         title: '10 Must-Visit Destinations in 2024',
         summary: 'Discover the most breathtaking destinations that should be on your travel bucket list this year.',
         image: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&h=250&fit=crop',
@@ -78,7 +78,7 @@ const ExploreTopics = ({ onClose }) => {
         comments: 18
       },
       {
-        id: 2,
+        _id: 2,
         title: 'Budget Travel Tips for Europe',
         summary: 'How to explore Europe without breaking the bank - practical tips and tricks.',
         image: 'https://images.unsplash.com/photo-1526772662000-3f88f10405ff?w=400&h=250&fit=crop',
@@ -90,7 +90,7 @@ const ExploreTopics = ({ onClose }) => {
     ],
     'Health': [
       {
-        id: 3,
+        _id: 3,
         title: 'The Complete Guide to Mental Wellness',
         summary: 'Essential practices for maintaining good mental health in today\'s fast-paced world.',
         image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=250&fit=crop',
@@ -100,7 +100,7 @@ const ExploreTopics = ({ onClose }) => {
         comments: 45
       },
       {
-        id: 4,
+        _id: 4,
         title: 'Nutrition Myths Debunked',
         summary: 'Separating fact from fiction in the world of nutrition and healthy eating.',
         image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&h=250&fit=crop',
@@ -112,7 +112,7 @@ const ExploreTopics = ({ onClose }) => {
     ],
     'Technology': [
       {
-        id: 5,
+        _id: 5,
         title: 'AI Revolution: What\'s Next?',
         summary: 'Exploring the latest developments in artificial intelligence and their impact on society.',
         image: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=250&fit=crop',
@@ -122,7 +122,7 @@ const ExploreTopics = ({ onClose }) => {
         comments: 67
       },
       {
-        id: 6,
+        _id: 6,
         title: 'Cybersecurity in 2024',
         summary: 'The evolving landscape of digital security and how to protect yourself online.',
         image: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400&h=250&fit=crop',
@@ -231,7 +231,7 @@ const ExploreTopics = ({ onClose }) => {
         <div className="px-6 py-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {articles.map((article) => (
-              <div key={article.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+              <div key={article._id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <img
                     src={article.image}

@@ -9,7 +9,7 @@ const Dashboard = () => {
 
   const recentArticles = [
     {
-      id: 1,
+      _id: 1,
       title: "How to improve blood flow",
       image: "https://images.unsplash.com/photo-1599585795426-3390ee964f96?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       author: "Dr. napoleon",
@@ -18,7 +18,7 @@ const Dashboard = () => {
       comments: 8
     },
     {
-      id: 2,
+      _id: 2,
       title: "How to become an expert artist",
       image: "https://images.unsplash.com/photo-1650783756107-739513b38177?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       author: "carmelasan",
@@ -27,7 +27,7 @@ const Dashboard = () => {
       comments: 5
     },
     {
-      id: 3,
+      _id: 3,
       title: "Can I really go Hogwarts to learn magic?",
       image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=300&h=200&fit=crop",
       author: "silo lavender",
@@ -39,7 +39,7 @@ const Dashboard = () => {
 
   const myArticles = [
     {
-      id: 1,
+      _id: 1,
       title: "Strategies to Increase Your Sales by 50%",
       image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=300&h=200&fit=crop",
       author: "ali",
@@ -48,7 +48,7 @@ const Dashboard = () => {
       comments: 12
     },
     {
-      id: 2,
+      _id: 2,
       title: "Most Disappointing Final Bosses in Gaming History",
       image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=200&fit=crop",
       author: "ali",
@@ -111,7 +111,7 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {recentArticles.map((article) => (
               <div
-                key={article.id}
+                key={article._id}
                 className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer`}
               >
                 <div className="relative overflow-hidden">
@@ -155,7 +155,7 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {myArticles.map((article) => (
               <div
-                key={article.id}
+                key={article._id}
                 className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer`}
               >
                 <div className="relative overflow-hidden">

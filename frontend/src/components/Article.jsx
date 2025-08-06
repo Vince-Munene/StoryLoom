@@ -8,6 +8,8 @@ const Article = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { user, isAuthenticated } = useAuth();
+  
+
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [commentSort, setCommentSort] = useState('top');
@@ -19,7 +21,18 @@ const Article = () => {
   // Fetch article data
   useEffect(() => {
     const fetchArticle = async () => {
-      if (!id) return;
+      if (!id) {
+        setError('No article ID provided');
+        setLoading(false);
+        return;
+      }
+      
+      // Validate ID format - allow both MongoDB ObjectId (24 characters) and numeric IDs (for mock data)
+      if (!/^[0-9a-fA-F]{24}$/.test(id) && !/^\d+$/.test(id)) {
+        setError('Invalid article ID format');
+        setLoading(false);
+        return;
+      }
       
       setLoading(true);
       setError(null);
@@ -34,7 +47,16 @@ const Article = () => {
         }
       } catch (error) {
         console.error('Error fetching article:', error);
-        setError(error.message || 'Failed to load article');
+        if (error.message === 'Resource not found' || error.message === 'Post not found') {
+          // Check if this is a numeric ID (mock data)
+          if (/^\d+$/.test(id)) {
+            setError('This is a demo article. Please create real articles to view them.');
+          } else {
+            setError('Article not found. It may have been deleted or moved.');
+          }
+        } else {
+          setError(error.message || 'Failed to load article');
+        }
       } finally {
         setLoading(false);
       }

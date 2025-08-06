@@ -341,7 +341,11 @@ const Home = () => {
                           </span>
                         </div>
                         <button 
-                          onClick={() => handleReadMore(post.id)}
+                          onClick={() => {
+                            // Use _id if available (from API), otherwise use id (from mock data)
+                            const postId = post._id || post.id;
+                            handleReadMore(postId);
+                          }}
                           className="px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-md hover:bg-orange-700 transition-colors"
                         >
                           Read More
