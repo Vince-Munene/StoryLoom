@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { postsAPI } from '../services/api';
@@ -39,6 +39,7 @@ const CreateArticle = ({
   const [showDropdown, setShowDropdown] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const contentEditableRef = useRef(null);
 
   // Load initial data when editing
   useEffect(() => {
@@ -649,16 +650,12 @@ const CreateArticle = ({
               </div>
               {/* Text Area */}
               <div className="flex-1 p-3 border-0 rounded-b-lg focus:outline-none resize-none overflow-y-auto">
-                <div
-                  contentEditable
-                  onInput={(e) => {
-                    setFormData(prev => ({
-                      ...prev,
-                      article: e.target.innerText
-                    }));
-                  }}
+                <textarea
+                  name="article"
+                  value={formData.article}
+                  onChange={handleInputChange}
                   placeholder="Write Your Article Here..."
-                  className={`min-h-full outline-none ${
+                  className={`min-h-full outline-none resize-none w-full ${
                     isDarkMode 
                       ? 'bg-gray-800 text-white placeholder-gray-400' 
                       : 'bg-orange-50 text-gray-900 placeholder-gray-500'
@@ -666,11 +663,14 @@ const CreateArticle = ({
                   style={{ 
                     minHeight: '200px',
                     whiteSpace: 'pre-wrap',
-                    textAlign: textFormatting.alignment
+                    textAlign: textFormatting.alignment,
+                    direction: 'ltr',
+                    border: 'none',
+                    fontFamily: 'inherit',
+                    fontSize: 'inherit',
+                    lineHeight: 'inherit'
                   }}
-                >
-                  {formData.article}
-                </div>
+                />
                 {/* Display images below the text area */}
                 {insertedImages.length > 0 && (
                   <div className="mt-4 space-y-4">
