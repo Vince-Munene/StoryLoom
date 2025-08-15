@@ -10,6 +10,8 @@ router.use((req, res, next) => {
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Expose-Headers', 'Content-Length, Content-Type');
+  res.header('Cross-Origin-Resource-Policy', 'cross-origin');
+  res.header('X-Content-Type-Options', 'nosniff');
   next();
 });
 
@@ -20,6 +22,8 @@ router.options('*', (req, res) => {
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Max-Age', '86400'); // 24 hours
+  res.header('Cross-Origin-Resource-Policy', 'cross-origin');
+  res.header('X-Content-Type-Options', 'nosniff');
   res.status(200).end();
 });
 
@@ -104,11 +108,14 @@ router.get('/:filename', (req, res) => {
         });
     }
 
-    // Set cache headers for better performance
+    // Set cache headers for better performance and cross-origin access
     res.set({
       'Content-Type': contentType,
       'Cache-Control': 'public, max-age=31536000', // Cache for 1 year
-      'Content-Length': stats.size
+      'Content-Length': stats.size,
+      'Cross-Origin-Resource-Policy': 'cross-origin',
+      'X-Content-Type-Options': 'nosniff',
+      'Access-Control-Allow-Origin': process.env.FRONTEND_URL || 'http://localhost:5173'
     });
 
     // Stream the file
@@ -156,6 +163,11 @@ router.get('/health', (req, res) => {
     cors: {
       origin: process.env.FRONTEND_URL || 'http://localhost:5173',
       credentials: true
+    },
+    headers: {
+      'Cross-Origin-Resource-Policy': res.getHeader('Cross-Origin-Resource-Policy'),
+      'X-Content-Type-Options': res.getHeader('X-Content-Type-Options'),
+      'Access-Control-Allow-Origin': res.getHeader('Access-Control-Allow-Origin')
     }
   });
 });
