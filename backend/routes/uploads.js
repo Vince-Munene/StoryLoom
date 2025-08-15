@@ -3,11 +3,23 @@ const path = require('path');
 const fs = require('fs');
 const router = express.Router();
 
+// CORS middleware for all uploads routes
+router.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', process.env.FRONTEND_URL || 'http://localhost:5173');
+  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Expose-Headers', 'Content-Length, Content-Type');
+  next();
+});
+
 // Handle preflight OPTIONS requests
 router.options('*', (req, res) => {
   res.header('Access-Control-Allow-Origin', process.env.FRONTEND_URL || 'http://localhost:5173');
   res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Max-Age', '86400'); // 24 hours
   res.status(200).end();
 });
 
@@ -20,6 +32,8 @@ router.get('/:filename', (req, res) => {
     res.header('Access-Control-Allow-Origin', process.env.FRONTEND_URL || 'http://localhost:5173');
     res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Expose-Headers', 'Content-Length, Content-Type');
     
     // Validate filename to prevent directory traversal attacks
     if (!filename || filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
@@ -38,6 +52,10 @@ router.get('/:filename', (req, res) => {
     console.log('File exists:', fs.existsSync(filePath));
     console.log('Current working directory:', process.cwd());
     console.log('__dirname:', __dirname);
+    console.log('CORS headers set:', {
+      'Access-Control-Allow-Origin': res.getHeader('Access-Control-Allow-Origin'),
+      'Access-Control-Allow-Credentials': res.getHeader('Access-Control-Allow-Credentials')
+    });
     
     // Check if file exists
     if (!fs.existsSync(filePath)) {
@@ -134,7 +152,11 @@ router.get('/health', (req, res) => {
     dirExists: fs.existsSync(path.join(__dirname, '../uploads')),
     files: fs.existsSync(path.join(__dirname, '../uploads')) ? fs.readdirSync(path.join(__dirname, '../uploads')) : [],
     currentDir: __dirname,
-    cwd: process.cwd()
+    cwd: process.cwd(),
+    cors: {
+      origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+      credentials: true
+    }
   });
 });
 
@@ -175,7 +197,8 @@ router.get('/test-image', (req, res) => {
       status: 'success',
       message: 'Test image created',
       testImagePath,
-      testImageUrl: '/api/uploads/test-image.png'
+      testImageUrl: '/api/uploads/test-image.png',
+      legacyUrl: '/uploads/test-image.png'
     });
   } catch (error) {
     console.error('Error creating test image:', error);
