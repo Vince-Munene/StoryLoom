@@ -66,7 +66,7 @@ router.put('/profile', protect, uploadSingle, async (req, res, next) => {
     if (bio !== undefined) user.bio = bio;
     if (req.file) {
       // Store the uploaded file path as avatar
-      user.avatar = `/uploads/${req.file.filename}`;
+      user.avatar = `/api/uploads/${req.file.filename}`;
     } else if (req.body.avatar !== undefined) {
       // Handle avatar as text field (for base64, URL, or empty string to reset)
       if (req.body.avatar === '') {

@@ -65,7 +65,7 @@ router.post('/', protect, uploadSingle, async (req, res, next) => {
 
     // Add image if uploaded
     if (req.file) {
-      postData.image = `/uploads/${req.file.filename}`;
+      postData.image = `/api/uploads/${req.file.filename}`;
     }
 
     const post = await Post.create(postData);
@@ -254,7 +254,7 @@ router.put('/:id', protect, uploadSingle, async (req, res, next) => {
 
     // Add image if uploaded
     if (req.file) {
-      updateData.image = `/uploads/${req.file.filename}`;
+      updateData.image = `/api/uploads/${req.file.filename}`;
     }
 
     post = await Post.findByIdAndUpdate(

@@ -11,6 +11,7 @@ require('dotenv').config({ path: './config.env' });
 const authRoutes = require('./routes/auth');
 const postRoutes = require('./routes/posts');
 const userRoutes = require('./routes/users');
+const uploadRoutes = require('./routes/uploads');
 
 // Import middleware
 const { errorHandler } = require('./middleware/errorHandler');
@@ -43,13 +44,21 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-// Static files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/uploads', uploadRoutes);
+
+// Legacy uploads route for backward compatibility
+app.use('/uploads', (req, res) => {
+  const filename = req.path.substring(1); // Remove leading slash
+  if (filename) {
+    res.redirect(`/api/uploads/${filename}`);
+  } else {
+    res.redirect('/api/uploads');
+  }
+});
 
 // API root endpoint
 app.get('/api', (req, res) => {
@@ -61,6 +70,7 @@ app.get('/api', (req, res) => {
       auth: '/api/auth',
       posts: '/api/posts',
       users: '/api/users',
+      uploads: '/api/uploads',
       health: '/api/health'
     },
     timestamp: new Date().toISOString()

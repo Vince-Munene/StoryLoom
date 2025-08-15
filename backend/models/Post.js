@@ -36,7 +36,7 @@ const postSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Post summary is required'],
     trim: true,
-    maxlength: [300, 'Summary cannot exceed 300 characters']
+    maxlength: [600, 'Summary cannot exceed 600 characters']
   },
   image: {
     type: String,
