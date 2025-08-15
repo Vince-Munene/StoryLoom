@@ -18,8 +18,24 @@ const { errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
 
-// Security middleware
-app.use(helmet());
+// Security middleware with custom configuration for cross-origin image loading
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  crossOriginEmbedderPolicy: false,
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "blob:", "http:", "https:"],
+      mediaSrc: ["'self'", "data:", "blob:", "http:", "https:"],
+      connectSrc: ["'self'", "http:", "https:"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      fontSrc: ["'self'", "data:", "http:", "https:"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: []
+    }
+  }
+}));
 
 // CORS configuration
 app.use(cors({
@@ -61,6 +77,8 @@ app.use('/uploads', (req, res, next) => {
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Expose-Headers', 'Content-Length, Content-Type');
+  res.header('Cross-Origin-Resource-Policy', 'cross-origin');
+  res.header('X-Content-Type-Options', 'nosniff');
   next();
 }, express.static(path.join(__dirname, 'uploads')));
 
