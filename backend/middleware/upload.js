@@ -11,12 +11,16 @@ if (!fs.existsSync(uploadsDir)) {
 // Configure storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
+    console.log('Upload destination:', uploadsDir);
+    console.log('Uploads directory exists:', fs.existsSync(uploadsDir));
     cb(null, uploadsDir);
   },
   filename: function (req, file, cb) {
     // Create unique filename with timestamp
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    const filename = file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname);
+    console.log('Generated filename:', filename);
+    cb(null, filename);
   }
 });
 
@@ -52,8 +56,10 @@ const uploadMultiple = upload.array('images', 5); // Max 5 images
 // Wrapper for error handling
 const handleUpload = (uploadType) => {
   return (req, res, next) => {
+    console.log('Upload middleware called');
     uploadType(req, res, (err) => {
       if (err instanceof multer.MulterError) {
+        console.error('Multer error:', err);
         if (err.code === 'LIMIT_FILE_SIZE') {
           return res.status(400).json({
             status: 'error',
@@ -65,11 +71,23 @@ const handleUpload = (uploadType) => {
           message: err.message
         });
       } else if (err) {
+        console.error('Upload error:', err);
         return res.status(400).json({
           status: 'error',
           message: err.message
         });
       }
+      
+      // Log successful upload
+      if (req.file) {
+        console.log('File uploaded successfully:', {
+          originalname: req.file.originalname,
+          filename: req.file.filename,
+          path: req.file.path,
+          size: req.file.size
+        });
+      }
+      
       next();
     });
   };

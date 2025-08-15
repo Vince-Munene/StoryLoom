@@ -16,7 +16,9 @@ const getAvatarUrl = (avatar) => {
   // If it's a relative path (starts with /), prepend the API base URL
   if (avatar.startsWith('/')) {
     const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-    return `${baseUrl}${avatar}`;
+    // Remove /api from the base URL since the path already includes it
+    const cleanBaseUrl = baseUrl.replace(/\/api$/, '');
+    return `${cleanBaseUrl}${avatar}`;
   }
   
   // Otherwise return as is (could be base64 or other format)

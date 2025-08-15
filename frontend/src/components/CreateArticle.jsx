@@ -12,6 +12,11 @@ const CreateArticle = ({
   onDelete = () => {},
   onClose = () => {}
 }) => {
+  // Predefined categories from the Post model
+  const predefinedCategories = [
+    'Technology', 'Travel', 'Health', 'Education', 'Economy', 
+    'Music', 'Science', 'Nature', 'Lifestyle', 'Other'
+  ];
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const [formData, setFormData] = useState({
@@ -21,7 +26,9 @@ const CreateArticle = ({
     publishDate: '',
     coverImage: null,
     coverImagePreview: null,
-    isPublished: false
+    isPublished: false,
+    category: 'Other',
+    customCategory: ''
   });
 
   const [textFormatting, setTextFormatting] = useState({
@@ -50,7 +57,9 @@ const CreateArticle = ({
         author: initialData.author || '',
         publishDate: initialData.publishDate || '',
         coverImage: initialData.coverImage || null,
-        isPublished: initialData.isPublished || false
+        isPublished: initialData.isPublished || false,
+        category: initialData.category || 'Other',
+        customCategory: initialData.customCategory || ''
       });
       setIsEditing(true);
     }
@@ -127,7 +136,7 @@ const CreateArticle = ({
         title: formData.title,
         content: formData.article,
         summary: formData.article.substring(0, 300) + (formData.article.length > 300 ? '...' : ''),
-        category: 'Other', // Default category
+        category: formData.category === 'Other' && formData.customCategory ? formData.customCategory : formData.category,
         status: 'draft'
       };
 
@@ -169,7 +178,7 @@ const CreateArticle = ({
         title: formData.title,
         content: formData.article,
         summary: formData.article.substring(0, 300) + (formData.article.length > 300 ? '...' : ''),
-        category: 'Other', // Default category
+        category: formData.category === 'Other' && formData.customCategory ? formData.customCategory : formData.category,
         status: 'published',
         author: user._id, // Use the logged-in user's ID
         image: formData.coverImagePreview || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&h=400&fit=crop' // Use selected image or default
@@ -256,7 +265,9 @@ const CreateArticle = ({
       publishDate: '',
       coverImage: null,
       coverImagePreview: null,
-      isPublished: false
+      isPublished: false,
+      category: 'Other',
+      customCategory: ''
     });
     
     setTextFormatting({
@@ -508,6 +519,70 @@ const CreateArticle = ({
                   : 'bg-orange-50 border border-orange-200 text-gray-900 placeholder-gray-500'
               }`}
             />
+          </div>
+
+          {/* Section/Category Selector */}
+          <div>
+            <label className={`block text-sm font-bold mb-1 ${
+              isDarkMode ? 'text-gray-300' : 'text-gray-900'
+            }`}>
+              Section
+            </label>
+            <div className="space-y-3">
+              {/* Predefined Categories */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+                {predefinedCategories.map((category) => (
+                  <button
+                    key={category}
+                    type="button"
+                    onClick={() => setFormData(prev => ({ 
+                      ...prev, 
+                      category: category,
+                      customCategory: category === 'Other' ? prev.customCategory : ''
+                    }))}
+                    className={`px-3 py-2 text-sm rounded-lg border transition-all duration-200 ${
+                      formData.category === category
+                        ? isDarkMode
+                          ? 'bg-midbrown border-midbrown text-white'
+                          : 'bg-midbrown border-midbrown text-white'
+                        : isDarkMode
+                          ? 'border-gray-600 text-gray-300 hover:border-gray-500 hover:bg-gray-700'
+                          : 'border-orange-200 text-gray-700 hover:border-orange-300 hover:bg-orange-100'
+                    }`}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+              
+              {/* Custom Category Input */}
+              {formData.category === 'Other' && (
+                <div className="mt-3">
+                  <label className={`block text-sm font-medium mb-1 ${
+                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                  }`}>
+                    Custom Section
+                  </label>
+                  <input
+                    type="text"
+                    name="customCategory"
+                    value={formData.customCategory}
+                    onChange={handleInputChange}
+                    placeholder="Enter custom section name..."
+                    className={`w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-midbrown focus:border-transparent ${
+                      isDarkMode 
+                        ? 'bg-gray-800 border border-gray-700 text-white placeholder-gray-400' 
+                        : 'bg-orange-50 border border-orange-200 text-gray-900 placeholder-gray-500'
+                    }`}
+                  />
+                  <p className={`text-xs mt-1 ${
+                    isDarkMode ? 'text-gray-500' : 'text-gray-500'
+                  }`}>
+                    Create your own section if none of the predefined ones fit your article
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Article Section */}
