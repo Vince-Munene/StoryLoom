@@ -24,7 +24,9 @@ app.use(helmet());
 // CORS configuration
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 // Rate limiting
@@ -50,15 +52,8 @@ app.use('/api/posts', postRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/uploads', uploadRoutes);
 
-// Legacy uploads route for backward compatibility
-app.use('/uploads', (req, res) => {
-  const filename = req.path.substring(1); // Remove leading slash
-  if (filename) {
-    res.redirect(`/api/uploads/${filename}`);
-  } else {
-    res.redirect('/api/uploads');
-  }
-});
+// Legacy uploads route for backward compatibility - serve directly instead of redirecting
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // API root endpoint
 app.get('/api', (req, res) => {
